@@ -1,0 +1,103 @@
+{
+  "caseStudies": [
+    {
+      "id": "1",
+      "slug": "saas-revenue-transformation",
+      "title": "SaaS Revenue Transformation: 340% Growth in 12 Months",
+      "summary": "How we helped a B2B SaaS company build a predictable revenue engine that scaled from $2M to $8.8M ARR.",
+      "industry": "SaaS",
+      "company_size": "51-200 employees",
+      "featured": true,
+      "results": [
+        { "value": "340%", "metric": "Revenue Growth" },
+        { "value": "2.5x", "metric": "Pipeline Increase" },
+        { "value": "45%", "metric": "Lower CAC" },
+        { "value": "60%", "metric": "Faster Sales Cycle" }
+      ],
+      "challenge": "The company had a strong product but unpredictable revenue. Marketing generated leads but sales struggled to prioritize and convert them efficiently.",
+      "solution": "We implemented a complete revenue infrastructure: clear ICP definition, automated lead scoring, sales-marketing alignment frameworks, and a multi-channel demand generation engine.",
+      "outcomes": [
+        "Predictable monthly revenue with 95% forecast accuracy",
+        "Sales team efficiency increased 3x through better lead prioritization",
+        "Customer acquisition cost reduced while increasing deal size",
+        "Established repeatable processes that scaled with the team"
+      ],
+      "testimonial": {
+        "quote": "Growth Valley didn't just help us grow—they gave us the systems to keep growing sustainably.",
+        "author": "VP of Revenue",
+        "company": "B2B SaaS Company"
+      }
+    },
+    {
+      "id": "2",
+      "slug": "manufacturing-demand-generation",
+      "title": "Manufacturing Company: Building a Modern Demand Engine",
+      "summary": "How a traditional manufacturing company transformed their go-to-market and generated 150+ qualified leads monthly.",
+      "industry": "Manufacturing",
+      "company_size": "201-500 employees",
+      "featured": true,
+      "results": [
+        { "value": "150+", "metric": "Monthly SQLs" },
+        { "value": "38%", "metric": "Conversion Rate" },
+        { "value": "4x", "metric": "Marketing ROI" }
+      ],
+      "challenge": "This 30-year-old manufacturing company relied entirely on referrals and trade shows. They had no digital presence or modern demand generation capabilities.",
+      "solution": "We built their first digital demand generation system: LinkedIn advertising, content marketing, email automation, and CRM integration—all aligned with their consultative sales process.",
+      "outcomes": [
+        "Generated more qualified leads in 3 months than previous 3 years combined",
+        "Established thought leadership in their specialized niche",
+        "Created predictable pipeline that replaced referral dependency",
+        "Built internal marketing capability through training and documentation"
+      ],
+      "testimonial": {
+        "quote": "We went from zero digital presence to a steady stream of qualified prospects. The transformation has been remarkable.",
+        "author": "CEO",
+        "company": "Industrial Manufacturing Co."
+      }
+    },
+    {
+      "id": "3",
+      "slug": "consulting-lead-automation",
+      "title": "Consulting Firm: Automating Lead Generation & Qualification",
+      "summary": "How a boutique consulting firm automated their lead generation and freed up 20 hours per week for client work.",
+      "industry": "Professional Services",
+      "company_size": "11-50 employees",
+      "featured": false,
+      "results": [
+        { "value": "20hrs", "metric": "Saved Weekly" },
+        { "value": "85%", "metric": "Lead Response Time" },
+        { "value": "3x", "metric": "Lead Volume" }
+      ],
+      "challenge": "Partners were spending significant time on business development activities that took away from billable client work. Lead follow-up was inconsistent.",
+      "solution": "We implemented automated lead capture, instant qualification through smart forms, and automated nurture sequences. Leads now flow directly to the right partner based on expertise match.",
+      "outcomes": [
+        "Automated lead qualification reduced partner time on unqualified prospects",
+        "Instant response times improved conversion by 400%",
+        "Sophisticated lead routing matched prospects with best-fit partners",
+        "Predictable pipeline replaced feast-or-famine business development"
+      ]
+    },
+    {
+      "id": "4",
+      "slug": "enterprise-sales-enablement",
+      "title": "Enterprise Sales Enablement: Shortening Complex Sales Cycles",
+      "summary": "How we reduced the average sales cycle from 9 months to 5 months for an enterprise software company.",
+      "industry": "Enterprise Software",
+      "company_size": "501-1000 employees",
+      "featured": false,
+      "results": [
+        { "value": "44%", "metric": "Shorter Sales Cycle" },
+        { "value": "28%", "metric": "Win Rate Increase" },
+        { "value": "$2.1M", "metric": "Additional Revenue" }
+      ],
+      "challenge": "Long, complex sales cycles were creating cash flow challenges and making forecasting unreliable. Deals stalled in the pipeline for months.",
+      "solution": "We implemented a comprehensive sales enablement system: buyer journey mapping, content libraries, stakeholder identification frameworks, and automated deal milestone tracking.",
+      "outcomes": [
+        "Clear visibility into deal progress and risks",
+        "Sales reps had the right content at the right time",
+        "Stakeholder mapping identified decision-makers earlier",
+        "Forecasting accuracy improved to 90%+"
+      ]
+    }
+  ]
+}

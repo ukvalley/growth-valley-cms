@@ -1,0 +1,226 @@
+const Testimonial = require('../models/Testimonial');
+
+// @desc    Get all testimonials (public)
+// @route   GET /api/testimonials
+// @access  Public
+exports.getTestimonials = async (req, res) => {
+  try {
+    const { status, featured } = req.query;
+    
+    let query = {};
+    if (status) query.status = status;
+    if (featured === 'true') query.featured = true;
+    
+    const testimonials = await Testimonial.find(query)
+      .sort({ order: 1, createdAt: -1 });
+    
+    res.json({
+      success: true,
+      data: testimonials
+    });
+  } catch (error) {
+    console.error('Get testimonials error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch testimonials'
+    });
+  }
+};
+
+// @desc    Get single testimonial
+// @route   GET /api/testimonials/:id
+// @access  Public
+exports.getTestimonial = async (req, res) => {
+  try {
+    const testimonial = await Testimonial.findById(req.params.id);
+    
+    if (!testimonial) {
+      return res.status(404).json({
+        success: false,
+        message: 'Testimonial not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: testimonial
+    });
+  } catch (error) {
+    console.error('Get testimonial error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch testimonial'
+    });
+  }
+};
+
+// @desc    Get all testimonials (admin)
+// @route   GET /api/testimonials/admin/all
+// @access  Private (Admin)
+exports.getAdminTestimonials = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+    
+    const [testimonials, total] = await Promise.all([
+      Testimonial.find()
+        .sort({ order: 1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Testimonial.countDocuments()
+    ]);
+    
+    res.json({
+      success: true,
+      data: testimonials,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Get admin testimonials error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch testimonials'
+    });
+  }
+};
+
+// @desc    Create testimonial
+// @route   POST /api/testimonials
+// @access  Private (Admin)
+exports.createTestimonial = async (req, res) => {
+  try {
+    const { quote, author, designation, company, avatar, rating, featured, status } = req.body;
+    
+    // Get max order for new testimonial
+    const maxOrder = await Testimonial.findOne().sort({ order: -1 }).select('order');
+    const order = (maxOrder?.order || 0) + 1;
+    
+    const testimonial = await Testimonial.create({
+      quote,
+      author,
+      designation,
+      company,
+      avatar,
+      rating: rating || 5,
+      featured: featured || false,
+      status: status || 'active',
+      order
+    });
+    
+    res.status(201).json({
+      success: true,
+      data: testimonial,
+      message: 'Testimonial created successfully'
+    });
+  } catch (error) {
+    console.error('Create testimonial error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to create testimonial'
+    });
+  }
+};
+
+// @desc    Update testimonial
+// @route   PUT /api/testimonials/:id
+// @access  Private (Admin)
+exports.updateTestimonial = async (req, res) => {
+  try {
+    const { quote, author, designation, company, avatar, rating, featured, status, order } = req.body;
+    
+    const testimonial = await Testimonial.findById(req.params.id);
+    
+    if (!testimonial) {
+      return res.status(404).json({
+        success: false,
+        message: 'Testimonial not found'
+      });
+    }
+    
+    // Update fields
+    if (quote !== undefined) testimonial.quote = quote;
+    if (author !== undefined) testimonial.author = author;
+    if (designation !== undefined) testimonial.designation = designation;
+    if (company !== undefined) testimonial.company = company;
+    if (avatar !== undefined) testimonial.avatar = avatar;
+    if (rating !== undefined) testimonial.rating = rating;
+    if (featured !== undefined) testimonial.featured = featured;
+    if (status !== undefined) testimonial.status = status;
+    if (order !== undefined) testimonial.order = order;
+    
+    await testimonial.save();
+    
+    res.json({
+      success: true,
+      data: testimonial,
+      message: 'Testimonial updated successfully'
+    });
+  } catch (error) {
+    console.error('Update testimonial error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update testimonial'
+    });
+  }
+};
+
+// @desc    Delete testimonial
+// @route   DELETE /api/testimonials/:id
+// @access  Private (Admin)
+exports.deleteTestimonial = async (req, res) => {
+  try {
+    const testimonial = await Testimonial.findById(req.params.id);
+    
+    if (!testimonial) {
+      return res.status(404).json({
+        success: false,
+        message: 'Testimonial not found'
+      });
+    }
+    
+    await testimonial.deleteOne();
+    
+    res.json({
+      success: true,
+      message: 'Testimonial deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete testimonial error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete testimonial'
+    });
+  }
+};
+
+// @desc    Reorder testimonials
+// @route   PUT /api/testimonials/reorder
+// @access  Private (Admin)
+exports.reorderTestimonials = async (req, res) => {
+  try {
+    const { orders } = req.body; // Array of { id, order }
+    
+    const updatePromises = orders.map(({ id, order }) => 
+      Testimonial.findByIdAndUpdate(id, { order }, { new: true })
+    );
+    
+    await Promise.all(updatePromises);
+    
+    res.json({
+      success: true,
+      message: 'Testimonials reordered successfully'
+    });
+  } catch (error) {
+    console.error('Reorder testimonials error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reorder testimonials'
+    });
+  }
+};

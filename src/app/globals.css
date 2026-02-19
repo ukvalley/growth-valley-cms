@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply bg-white text-brand-black antialiased;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+  }
+  
+  .dark body {
+    @apply bg-brand-grey-950 text-white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-brand-grey-100;
+  }
+  
+  .dark ::-webkit-scrollbar-track {
+    @apply bg-brand-grey-900;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-brand-grey-300 rounded;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-brand-grey-700;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-brand-grey-400;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb:hover {
+    @apply bg-brand-grey-600;
+  }
+}
+
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 
+           bg-accent text-brand-black font-semibold text-sm uppercase tracking-wide 
+           transition-all duration-200 
+           hover:bg-accent-light
+           focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2
+           dark:focus:ring-offset-brand-grey-950;
+  }
+  
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 
+           border-2 border-brand-black text-brand-black font-semibold text-sm uppercase tracking-wide 
+           transition-all duration-200 
+           hover:bg-brand-black hover:text-white
+           focus:outline-none focus:ring-2 focus:ring-brand-black focus:ring-offset-2
+           dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-brand-black
+           dark:focus:ring-offset-brand-grey-950;
+  }
+  
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-6 py-3 
+           text-accent font-semibold text-sm uppercase tracking-wide 
+           transition-all duration-200 
+           hover:bg-accent/10 
+           focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2
+           dark:focus:ring-offset-brand-grey-950;
+  }
+  
+  /* Cards */
+  .card {
+    @apply bg-white dark:bg-brand-grey-900 border border-brand-grey-200 dark:border-brand-grey-800 p-6 lg:p-8 
+           transition-all duration-200 
+           hover:shadow-card-hover hover:border-brand-grey-300 dark:hover:border-brand-grey-700;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
