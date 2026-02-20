@@ -76,6 +76,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/admin', routes.admin);
 app.use('/api/blog', routes.blog);
 app.use('/api/case-studies', routes.caseStudies);
+app.use('/api/clients', routes.clients);
 app.use('/api/content', routes.content);
 app.use('/api/contact', routes.enquiries);
 app.use('/api/settings', routes.settings);

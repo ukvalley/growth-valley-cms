@@ -371,3 +371,40 @@ export const contentAPI = {
     return apiRequest('/api/content/initialize', { method: 'POST' });
   },
 };
+
+// Client API - manage client/partner logos
+export const clientAPI = {
+  getAll: async (params?: { featured?: boolean; status?: string }) => {
+    const query = new URLSearchParams(params as any).toString();
+    return apiRequest(`/api/clients${query ? `?${query}` : ''}`);
+  },
+
+  getById: async (id: string) => {
+    return apiRequest(`/api/clients/${id}`);
+  },
+
+  create: async (data: any) => {
+    return apiRequest('/api/clients', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  update: async (id: string, data: any) => {
+    return apiRequest(`/api/clients/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  delete: async (id: string) => {
+    return apiRequest(`/api/clients/${id}`, { method: 'DELETE' });
+  },
+
+  reorder: async (orders: { id: string; order: number }[]) => {
+    return apiRequest('/api/clients/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ orders }),
+    });
+  },
+};

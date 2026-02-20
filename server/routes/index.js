@@ -3,6 +3,7 @@ module.exports = {
   admin: require('./admin'),
   blog: require('./blog'),
   caseStudies: require('./caseStudies'),
+  clients: require('./client'),
   content: require('./content'),
   enquiries: require('./enquiries'),
   settings: require('./settings'),
