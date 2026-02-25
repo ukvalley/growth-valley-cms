@@ -4,24 +4,7 @@ const blogController = require('../controllers/blogController');
 const { protect } = require('../middleware/auth');
 const { validation } = require('../middleware');
 
-// Public routes
-// @route   GET /api/blog
-// @desc    Get all published blog posts
-router.get('/', blogController.getBlogs);
-
-// @route   GET /api/blog/categories
-// @desc    Get blog categories
-router.get('/categories', blogController.getCategories);
-
-// @route   GET /api/blog/tags
-// @desc    Get blog tags
-router.get('/tags', blogController.getTags);
-
-// @route   GET /api/blog/:slug
-// @desc    Get single blog post by slug
-router.get('/:slug', blogController.getBlogBySlug);
-
-// Admin routes (protected)
+// Admin routes (protected) - MUST come before :slug route
 // @route   GET /api/blog/admin/all
 // @desc    Get all blog posts (including drafts)
 router.get('/admin/all', protect, blogController.getAdminBlogs);
@@ -41,5 +24,22 @@ router.put('/:id', protect, validation.validateBody(validation.schemas.updateBlo
 // @route   DELETE /api/blog/:id
 // @desc    Delete blog post
 router.delete('/:id', protect, blogController.deleteBlog);
+
+// Public routes
+// @route   GET /api/blog
+// @desc    Get all published blog posts
+router.get('/', blogController.getBlogs);
+
+// @route   GET /api/blog/categories
+// @desc    Get blog categories
+router.get('/categories', blogController.getCategories);
+
+// @route   GET /api/blog/tags
+// @desc    Get blog tags
+router.get('/tags', blogController.getTags);
+
+// @route   GET /api/blog/:slug
+// @desc    Get single blog post by slug (must be last)
+router.get('/:slug', blogController.getBlogBySlug);
 
 module.exports = router;

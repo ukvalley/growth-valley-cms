@@ -429,7 +429,7 @@ export async function getPageContent(page: string): Promise<PageContent> {
   
   try {
     const response = await fetch(`${API_URL}/api/content/${pageKey}`, {
-      next: { revalidate: 60 } // Cache for 60 seconds
+      cache: 'no-store', // Disable caching to always get fresh content
     });
     
     if (response.ok) {

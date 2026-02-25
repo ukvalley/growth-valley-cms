@@ -6,6 +6,15 @@ import Link from 'next/link';
 import { caseStudyAPI, mediaAPI } from '@/lib/admin-api';
 import AdminLayout from '../../AdminLayout';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+// Helper to get full URL for images
+const getImageUrl = (url: string | undefined) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `${API_URL}${url}`;
+};
+
 const industries = ['SaaS', 'E-commerce', 'Healthcare', 'Finance', 'Education', 'Manufacturing', 'Real Estate', 'Technology', 'Other'];
 
 interface Result {
@@ -286,7 +295,7 @@ export default function EditCaseStudyPage() {
                   <div className="border-2 border-dashed border-brand-grey-300 dark:border-brand-grey-700 rounded-lg p-4 text-center">
                     {formData.featuredImage ? (
                       <div className="relative">
-                        <img src={formData.featuredImage} alt="Featured" className="w-full h-40 object-cover rounded" />
+                        <img src={getImageUrl(formData.featuredImage)} alt="Featured" className="w-full h-40 object-cover rounded" />
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, featuredImage: '' }))}
@@ -320,7 +329,7 @@ export default function EditCaseStudyPage() {
                   <div className="border-2 border-dashed border-brand-grey-300 dark:border-brand-grey-700 rounded-lg p-4 text-center">
                     {formData.clientLogo ? (
                       <div className="relative">
-                        <img src={formData.clientLogo} alt="Client Logo" className="w-full h-40 object-contain rounded bg-white p-4" />
+                        <img src={getImageUrl(formData.clientLogo)} alt="Client Logo" className="w-full h-40 object-contain rounded bg-white p-4" />
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, clientLogo: '' }))}
@@ -505,7 +514,7 @@ export default function EditCaseStudyPage() {
                   <div className="border-2 border-dashed border-brand-grey-300 dark:border-brand-grey-700 rounded-lg p-4 text-center">
                     {formData.testimonial.avatar ? (
                       <div className="relative inline-block">
-                        <img src={formData.testimonial.avatar} alt="Avatar" className="w-20 h-20 object-cover rounded-full" />
+                        <img src={getImageUrl(formData.testimonial.avatar)} alt="Avatar" className="w-20 h-20 object-cover rounded-full" />
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({

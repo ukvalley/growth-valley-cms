@@ -8,7 +8,7 @@ export const metadata = {
   description: "Insights, strategies, and best practices for B2B revenue growth from the Growth Valley team.",
 };
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = 'force-dynamic';
 
 async function getBlogs() {
   try {

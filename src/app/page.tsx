@@ -7,11 +7,14 @@ import { getPageContent, getSection, PageContent } from "@/lib/content";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+// Disable static generation for dynamic content
+export const dynamic = 'force-dynamic';
+
 // Fetch testimonials from API
 async function getTestimonials() {
   try {
     const res = await fetch(`${API_URL}/api/testimonials?status=active`, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     });
     const data = await res.json();
     return data.success ? data.data : [];
@@ -24,7 +27,7 @@ async function getTestimonials() {
 async function getClients() {
   try {
     const res = await fetch(`${API_URL}/api/clients?status=active`, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     });
     const data = await res.json();
     return data.success ? data.data : [];

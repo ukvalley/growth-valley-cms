@@ -5,7 +5,7 @@ import Button from "@/components/Button";
 import { getPageContent, getSection, getPageSEO } from "@/lib/content";
 import { Metadata } from "next";
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getPageContent('services');

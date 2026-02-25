@@ -10,15 +10,29 @@ export const getToken = () => {
   return null;
 };
 
+export const getRefreshToken = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('adminRefreshToken');
+  }
+  return null;
+};
+
 export const setToken = (token: string) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem('adminToken', token);
   }
 };
 
+export const setRefreshToken = (token: string) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('adminRefreshToken', token);
+  }
+};
+
 export const removeToken = () => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminRefreshToken');
     localStorage.removeItem('adminUser');
   }
 };
@@ -37,8 +51,36 @@ export const setUser = (user: any) => {
   }
 };
 
-// API request helper
-async function apiRequest(endpoint: string, options: RequestInit = {}) {
+// Refresh access token
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+
+  try {
+    const response = await fetch(`${API_URL}/api/admin/refresh-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      setToken(data.data.accessToken);
+      setRefreshToken(data.data.refreshToken);
+      return data.data.accessToken;
+    }
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+  }
+  
+  // Refresh failed, clear tokens
+  removeToken();
+  return null;
+}
+
+// API request helper with auto-refresh
+async function apiRequest(endpoint: string, options: RequestInit = {}, retry = true): Promise<any> {
   const token = getToken();
   
   const headers: HeadersInit = {
@@ -53,6 +95,21 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
   });
 
   const data = await response.json();
+
+  // Handle token expiration
+  if (response.status === 401 && data.message?.includes('Token expired') && retry) {
+    const newToken = await refreshAccessToken();
+    if (newToken) {
+      // Retry with new token
+      return apiRequest(endpoint, options, false);
+    } else {
+      // Redirect to login
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+      throw new Error('Session expired. Please login again.');
+    }
+  }
 
   if (!response.ok) {
     throw new Error(data.message || data.error || 'API request failed');
@@ -70,6 +127,7 @@ export const authAPI = {
     });
     if (data.success) {
       setToken(data.data.accessToken);
+      setRefreshToken(data.data.refreshToken);
       setUser(data.data.admin);
     }
     return data;
@@ -77,7 +135,11 @@ export const authAPI = {
 
   logout: async () => {
     try {
-      await apiRequest('/api/admin/logout', { method: 'POST' });
+      const refreshToken = getRefreshToken();
+      await apiRequest('/api/admin/logout', {
+        method: 'POST',
+        body: JSON.stringify({ refreshToken }),
+      });
     } catch (e) {
       // Ignore logout errors
     }
@@ -99,6 +161,10 @@ export const blogAPI = {
 
   getBySlug: async (slug: string) => {
     return apiRequest(`/api/blog/${slug}`);
+  },
+
+  getById: async (id: string) => {
+    return apiRequest(`/api/blog/admin/${id}`);
   },
 
   create: async (data: any) => {

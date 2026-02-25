@@ -355,6 +355,14 @@ export default function PageContentEditor() {
   const router = useRouter();
   const pageName = params.page as string;
 
+  // Map content page names to frontend routes
+  const pageRouteMap: Record<string, string> = {
+    'about': 'company', // 'about' content maps to /company page
+    'home': '',         // home maps to root
+  };
+  
+  const previewRoute = pageRouteMap[pageName] ?? pageName;
+
   const [content, setContent] = useState<PageContent | null>(null);
   const [structure, setStructure] = useState<SectionInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -505,7 +513,7 @@ export default function PageContentEditor() {
         </div>
         <div className="flex items-center gap-3">
           <a
-            href={`/${pageName === 'home' ? '' : pageName}`}
+            href={`/${previewRoute}`}
             target="_blank"
             className="px-4 py-2 border border-brand-grey-300 dark:border-brand-grey-700 text-brand-black dark:text-white rounded-lg hover:border-accent transition-colors flex items-center gap-2"
           >

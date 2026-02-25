@@ -10,7 +10,7 @@ export const metadata = {
     "Expert perspectives on revenue operations, sales process design, and B2B growth strategies.",
 };
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = 'force-dynamic';
 
 async function getBlogs() {
   try {

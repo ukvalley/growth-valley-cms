@@ -37,7 +37,7 @@ export default function EditBlogPage() {
 
   const loadBlog = async () => {
     try {
-      const response = await blogAPI.getBySlug(id);
+      const response = await blogAPI.getById(id);
       if (response.success) {
         const blog = response.data;
         setFormData({
@@ -96,8 +96,8 @@ export default function EditBlogPage() {
       <AdminLayout>
         <div className="p-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-brand-grey-200 rounded w-1/4 mb-8"></div>
-            <div className="h-96 bg-brand-grey-200 rounded"></div>
+            <div className="h-8 bg-brand-grey-200 dark:bg-brand-grey-800 rounded w-1/4 mb-8"></div>
+            <div className="h-96 bg-brand-grey-200 dark:bg-brand-grey-800 rounded"></div>
           </div>
         </div>
       </AdminLayout>
@@ -116,11 +116,11 @@ export default function EditBlogPage() {
         <h1 className="text-3xl font-bold text-brand-black dark:text-white mb-8">Edit Blog Post</h1>
 
       <form onSubmit={handleSubmit} className="max-w-4xl">
-        <div className="bg-white p-6 rounded-lg border border-brand-grey-100 space-y-6">
+        <div className="bg-white dark:bg-brand-grey-900 p-6 rounded-lg border border-brand-grey-100 dark:border-brand-grey-800 space-y-6">
           {/* Title & Slug */}
           <div className="grid grid-cols-1 gap-6">
             <div>
-              <label className="block text-sm font-medium text-brand-black mb-2">
+              <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">
                 Title *
               </label>
               <input
@@ -128,12 +128,12 @@ export default function EditBlogPage() {
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 required
-                className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow"
+                className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-brand-black mb-2">
+              <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">
                 Slug *
               </label>
               <input
@@ -142,14 +142,14 @@ export default function EditBlogPage() {
                 onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
                 required
                 pattern="[a-z0-9-]+"
-                className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow"
+                className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
               />
             </div>
           </div>
 
           {/* Excerpt */}
           <div>
-            <label className="block text-sm font-medium text-brand-black mb-2">
+            <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">
               Excerpt *
             </label>
             <textarea
@@ -158,7 +158,7 @@ export default function EditBlogPage() {
               required
               rows={3}
               maxLength={300}
-              className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow"
+              className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
             />
             <p className="text-xs text-brand-grey-400 mt-1">
               {formData.excerpt.length}/300 characters
@@ -167,7 +167,7 @@ export default function EditBlogPage() {
 
           {/* Content */}
           <div>
-            <label className="block text-sm font-medium text-brand-black mb-2">
+            <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">
               Content *
             </label>
             <textarea
@@ -175,20 +175,20 @@ export default function EditBlogPage() {
               onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
               required
               rows={15}
-              className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow font-mono text-sm"
+              className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent font-mono text-sm"
             />
           </div>
 
           {/* Category & Tags */}
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-brand-black mb-2">
+              <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">
                 Category *
               </label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow"
+                className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
               >
                 {categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -197,14 +197,14 @@ export default function EditBlogPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-brand-black mb-2">
+              <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">
                 Tags
               </label>
               <input
                 type="text"
                 value={formData.tags}
                 onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-                className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow"
+                className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
                 placeholder="tag1, tag2, tag3"
               />
             </div>
@@ -213,13 +213,13 @@ export default function EditBlogPage() {
           {/* Status & Featured */}
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-brand-black mb-2">
+              <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">
                 Status
               </label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow"
+                className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -233,19 +233,19 @@ export default function EditBlogPage() {
                   type="checkbox"
                   checked={formData.featured}
                   onChange={(e) => setFormData(prev => ({ ...prev, featured: e.target.checked }))}
-                  className="w-5 h-5 rounded border-brand-grey-300 text-brand-yellow focus:ring-brand-yellow"
+                  className="w-5 h-5 rounded border-brand-grey-300 dark:border-brand-grey-600 text-accent focus:ring-accent"
                 />
-                <span className="text-sm font-medium text-brand-black">Featured Post</span>
+                <span className="text-sm font-medium text-brand-black dark:text-white">Featured Post</span>
               </label>
             </div>
           </div>
 
           {/* SEO Section */}
-          <div className="border-t border-brand-grey-100 pt-6">
-            <h3 className="text-lg font-semibold text-brand-black mb-4">SEO Settings</h3>
+          <div className="border-t border-brand-grey-100 dark:border-brand-grey-800 pt-6">
+            <h3 className="text-lg font-semibold text-brand-black dark:text-white mb-4">SEO Settings</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-brand-black mb-2">Meta Title</label>
+                <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">Meta Title</label>
                 <input
                   type="text"
                   value={formData.seo.metaTitle}
@@ -254,11 +254,11 @@ export default function EditBlogPage() {
                     seo: { ...prev.seo, metaTitle: e.target.value }
                   }))}
                   maxLength={60}
-                  className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow"
+                  className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-brand-black mb-2">Meta Description</label>
+                <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">Meta Description</label>
                 <textarea
                   value={formData.seo.metaDescription}
                   onChange={(e) => setFormData(prev => ({
@@ -267,11 +267,11 @@ export default function EditBlogPage() {
                   }))}
                   rows={2}
                   maxLength={160}
-                  className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow"
+                  className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-brand-black mb-2">Keywords</label>
+                <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">Keywords</label>
                 <input
                   type="text"
                   value={formData.seo.keywords}
@@ -279,7 +279,7 @@ export default function EditBlogPage() {
                     ...prev,
                     seo: { ...prev.seo, keywords: e.target.value }
                   }))}
-                  className="w-full px-4 py-3 border border-brand-grey-200 rounded-lg focus:outline-none focus:border-brand-yellow"
+                  className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
                   placeholder="keyword1, keyword2, keyword3"
                 />
               </div>
@@ -287,17 +287,17 @@ export default function EditBlogPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-4 pt-6 border-t border-brand-grey-100">
+          <div className="flex items-center justify-end gap-4 pt-6 border-t border-brand-grey-100 dark:border-brand-grey-800">
             <Link
               href="/admin/blog"
-              className="px-6 py-3 border border-brand-grey-200 text-brand-black rounded-lg hover:bg-brand-grey-50 transition-colors"
+              className="px-6 py-3 border border-brand-grey-200 dark:border-brand-grey-700 text-brand-black dark:text-white rounded-lg hover:bg-brand-grey-50 dark:hover:bg-brand-grey-800 transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-3 bg-brand-yellow text-brand-black font-semibold rounded-lg hover:bg-yellow-400 transition-colors disabled:opacity-50"
+              className="px-6 py-3 bg-accent text-brand-black font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>

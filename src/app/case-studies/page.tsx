@@ -10,7 +10,7 @@ export const metadata = {
     "Real transformations. Real numbers. See how we've helped B2B companies achieve predictable revenue growth.",
 };
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = 'force-dynamic';
 
 async function getCaseStudies() {
   try {
