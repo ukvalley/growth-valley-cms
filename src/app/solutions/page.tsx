@@ -4,6 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import Button from "@/components/Button";
 import { getPageContent, getSection, getPageSEO } from "@/lib/content";
 import { Metadata } from "next";
+import { motion } from "framer-motion";
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +17,29 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: seo.keywords,
   };
 }
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
 
 // Icon components for solutions
 const solutionIcons: Record<string, React.ReactNode> = {
@@ -61,21 +85,44 @@ export default async function SolutionsPage() {
         description={hero?.description || "We offer four core solutions, each designed to address specific revenue challenges. Deploy individually or together for maximum impact."}
       />
 
-      <Section>
-        <Container>
-          <div className="space-y-20">
+      <section className="relative py-20 bg-white dark:bg-brand-grey-950 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-dot-pattern" />
+        
+        {/* Floating Elements */}
+        <motion.div 
+          className="absolute top-20 right-1/4 w-4 h-4 bg-accent/20 rotate-45"
+          animate={{ rotate: [45, 90, 45], y: [0, -20, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute top-1/3 left-10 w-3 h-3 bg-accent/15 rounded-full"
+          animate={{ scale: [1, 1.5, 1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        />
+        
+        <Container className="relative z-10">
+          <div className="space-y-32">
             {solutions?.map((solution, index) => (
-              <div
+              <motion.div
                 key={solution.id}
                 id={solution.id}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6, delay: 0.1 }}
                 className={`grid lg:grid-cols-2 gap-12 lg:gap-16 items-start ${
                   index % 2 === 1 ? "lg:grid-flow-dense" : ""
                 }`}
               >
                 <div className={index % 2 === 1 ? "lg:col-start-2" : ""}>
-                  <div className="text-accent mb-6">
+                  <motion.div 
+                    className="text-accent mb-6"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
                     {solutionIcons[solution.id] || solutionIcons['revenue-architecture']}
-                  </div>
+                  </motion.div>
                   <h2 className="text-heading-2 text-brand-black dark:text-white mb-4">
                     {solution.title}
                   </h2>
@@ -89,24 +136,32 @@ export default async function SolutionsPage() {
                     </h4>
                     <ul className="space-y-3">
                       {solution.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-3">
-                          <svg
+                        <motion.li 
+                          key={idx} 
+                          className="flex items-start gap-3"
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: idx * 0.1 }}
+                        >
+                          <motion.svg
                             className="w-5 h-5 text-accent mt-1 flex-shrink-0"
                             fill="none"
                             viewBox="0 0 24 24"
                             strokeWidth={2}
                             stroke="currentColor"
+                            whileHover={{ scale: 1.2 }}
                           >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               d="M4.5 12.75l6 6 9-13.5"
                             />
-                          </svg>
+                          </motion.svg>
                           <span className="text-body text-brand-grey-600 dark:text-brand-grey-300">
                             {feature}
                           </span>
-                        </li>
+                        </motion.li>
                       ))}
                     </ul>
                   </div>
@@ -114,51 +169,90 @@ export default async function SolutionsPage() {
                   <Button href="/contact">Learn More</Button>
                 </div>
 
-                <div
-                  className={`bg-brand-grey-50 dark:bg-brand-grey-900 p-8 ${
+                <motion.div
+                  className={`bg-brand-grey-50 dark:bg-brand-grey-900 p-8 relative overflow-hidden ${
                     index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""
                   }`}
+                  whileHover={{ boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                  transition={{ type: 'spring', stiffness: 300 }}
                 >
+                  {/* Decorative corner */}
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-accent/10" />
+                  
                   <h4 className="text-label text-brand-grey-400 dark:text-brand-grey-500 uppercase mb-6">
                     Expected Outcomes
                   </h4>
                   <div className="space-y-4">
                     {solution.outcomes.map((outcome, idx) => (
-                      <div
+                      <motion.div
                         key={idx}
                         className="flex items-center gap-4 border-b border-brand-grey-200 dark:border-brand-grey-700 pb-4 last:border-0 last:pb-0"
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.1 + 0.2 }}
                       >
-                        <span className="text-heading-4 text-accent">
+                        <motion.span 
+                          className="text-heading-4 text-accent"
+                          whileHover={{ scale: 1.2 }}
+                        >
                           ✓
-                        </span>
+                        </motion.span>
                         <span className="text-body-lg text-brand-black dark:text-white">
                           {outcome}
                         </span>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             ))}
           </div>
         </Container>
-      </Section>
+      </section>
 
-      <Section background="grey">
-        <Container>
-          <div className="max-w-3xl mx-auto text-center">
+      {/* CTA Section */}
+      <section className="relative py-24 bg-brand-grey-50 dark:bg-brand-grey-900 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-animated-gradient" />
+        
+        {/* Floating Shapes */}
+        <motion.div 
+          className="absolute top-10 left-1/4 w-4 h-4 bg-accent/30 rounded-full"
+          animate={{ y: [0, -30, 0], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute bottom-20 right-1/3 w-3 h-3 bg-accent/25 rotate-45"
+          animate={{ rotate: [45, 90, 45] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        />
+        
+        <Container className="relative z-10">
+          <motion.div 
+            className="max-w-3xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             <h2 className="text-heading-2 text-brand-black dark:text-white mb-6">
               {cta?.title || "Not sure which solution you need?"}
             </h2>
             <p className="text-body-lg text-brand-grey-500 dark:text-brand-grey-400 mb-10">
               {cta?.description || "Our discovery process identifies the highest-impact opportunities for your specific situation."}
             </p>
-            <Button href={cta?.buttonLink || "/contact"}>
-              {cta?.buttonText || "Schedule a Discovery Call"}
-            </Button>
-          </div>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button href={cta?.buttonLink || "/contact"}>
+                {cta?.buttonText || "Schedule a Discovery Call"}
+              </Button>
+            </motion.div>
+          </motion.div>
         </Container>
-      </Section>
+      </section>
     </>
   );
 }

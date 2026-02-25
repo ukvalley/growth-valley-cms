@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
 import { useLogo } from "@/lib/settings-context";
 
@@ -17,59 +18,97 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { logo, hasLogo, siteName } = useLogo();
   const [mounted, setMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-brand-grey-950/95 backdrop-blur-sm border-b border-brand-grey-200 dark:border-brand-grey-800">
+    <motion.header 
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b transition-all duration-300 ${
+        scrolled 
+          ? 'bg-white/98 dark:bg-brand-grey-950/98 shadow-sm border-brand-grey-200 dark:border-brand-grey-800' 
+          : 'bg-white/95 dark:bg-brand-grey-950/95 border-brand-grey-200 dark:border-brand-grey-800'
+      }`}
+    >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             {mounted && hasLogo && logo ? (
-              <img 
+              <motion.img 
                 src={logo} 
                 alt={siteName}
                 className="h-8 w-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
               />
             ) : (
-              <span className="text-2xl font-semibold tracking-tight text-brand-black dark:text-white">
+              <motion.span 
+                className="text-2xl font-semibold tracking-tight text-brand-black dark:text-white"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
                 {siteName.split(' ')[0]}<span className="text-accent">{siteName.split(' ')[1] || ''}</span>
-              </span>
+              </motion.span>
             )}
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
-            {navigation.map((item) => (
-              <Link
+            {navigation.map((item, index) => (
+              <motion.div
                 key={item.name}
-                href={item.href}
-                className="text-body text-brand-grey-600 dark:text-brand-grey-400 hover:text-brand-black dark:hover:text-white transition-colors"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
               >
-                {item.name}
-              </Link>
+                <Link
+                  href={item.href}
+                  className="relative text-body text-brand-grey-600 dark:text-brand-grey-400 hover:text-brand-black dark:hover:text-white transition-colors group"
+                >
+                  {item.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
+                </Link>
+              </motion.div>
             ))}
           </div>
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-4">
             <ThemeToggle />
-            <Link href="/contact" className="btn-primary">
-              Schedule a Call
-            </Link>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Link href="/contact" className="btn-primary">
+                Schedule a Call
+              </Link>
+            </motion.div>
           </div>
 
           {/* Mobile menu button */}
           <div className="lg:hidden flex items-center gap-2">
             <ThemeToggle />
-            <button
+            <motion.button
               type="button"
               className="p-2 text-brand-black dark:text-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
+              whileTap={{ scale: 0.95 }}
             >
               <svg
                 className="w-6 h-6"
@@ -92,35 +131,58 @@ export default function Navbar() {
                   />
                 )}
               </svg>
-            </button>
+            </motion.button>
           </div>
         </div>
 
         {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-brand-grey-200 dark:border-brand-grey-800">
-            <div className="flex flex-col gap-2">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-body text-brand-grey-600 dark:text-brand-grey-400 hover:text-brand-black dark:hover:text-white transition-colors py-3"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <Link
-                href="/contact"
-                className="btn-primary mt-4 text-center"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Schedule a Call
-              </Link>
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="lg:hidden overflow-hidden border-t border-brand-grey-200 dark:border-brand-grey-800"
+            >
+              <div className="py-4">
+                <div className="flex flex-col gap-1">
+                  {navigation.map((item, index) => (
+                    <motion.div
+                      key={item.name}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                    >
+                      <Link
+                        href={item.href}
+                        className="text-body text-brand-grey-600 dark:text-brand-grey-400 hover:text-brand-black dark:hover:text-white transition-colors py-3 block"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    </motion.div>
+                  ))}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.2, delay: navigation.length * 0.05 }}
+                    className="mt-4"
+                  >
+                    <Link
+                      href="/contact"
+                      className="btn-primary text-center block"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Schedule a Call
+                    </Link>
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
-    </header>
+    </motion.header>
   );
 }
