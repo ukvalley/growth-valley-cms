@@ -1,9 +1,7 @@
-import Container from "@/components/Container";
-import Section from "@/components/Section";
 import PageHeader from "@/components/PageHeader";
-import ContactForm from "@/components/ContactForm";
 import { getPageContent, getSection, getPageSEO } from "@/lib/content";
 import { Metadata } from "next";
+import ContactClient from "./ContactClient";
 
 export const dynamic = 'force-dynamic';
 
@@ -44,38 +42,12 @@ export default async function ContactPage() {
         description={hero?.description || "Ready to transform your revenue operations? Let's start the conversation."}
         breadcrumb={[{ label: "Contact", href: "/contact" }]}
       />
-
-      <Section>
-        <Container>
-          <ContactForm
-            interests={form?.interests || [
-              { value: "revenue-architecture", label: "Revenue Architecture" },
-              { value: "sales-process", label: "Sales Process Design" },
-              { value: "revops", label: "RevOps Implementation" },
-              { value: "gtm", label: "Go-to-Market Strategy" },
-              { value: "other", label: "Other / Not Sure" },
-            ]}
-            contactInfo={{
-              title: info?.title || "Direct Contact",
-              email: info?.email || "hello@growthvalley.com",
-              location: info?.location || "Nashik, Maharashtra, India",
-            }}
-            expectations={{
-              title: expectations?.title || "What to Expect",
-              items: expectations?.items || [
-                "Response within one business day",
-                "Initial discovery call to understand your situation",
-                "Clear proposal with scope, timeline, and investment",
-                "No commitment required for initial conversation",
-              ],
-            }}
-            successMessage={{
-              title: successMessage?.title || "Message Received",
-              description: successMessage?.description || "Thank you for reaching out. We'll get back to you within one business day.",
-            }}
-          />
-        </Container>
-      </Section>
+      <ContactClient 
+        form={form}
+        info={info}
+        expectations={expectations}
+        successMessage={successMessage}
+      />
     </>
   );
 }
