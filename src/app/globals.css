@@ -10,46 +10,58 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   body {
     @apply bg-white text-brand-black antialiased;
     font-feature-settings: 'kern' 1, 'liga' 1;
   }
-  
+
   .dark body {
     @apply bg-brand-grey-950 text-white;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
-  
+
+  /* Paragraph styling - Bug #1 fix */
+  p {
+    @apply text-base leading-relaxed;
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  /* Section spacing fix - Bug #2 */
+  section + section {
+    @apply pt-16 lg:pt-20;
+  }
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-  
+
   ::-webkit-scrollbar-track {
     @apply bg-brand-grey-100;
   }
-  
+
   .dark ::-webkit-scrollbar-track {
     @apply bg-brand-grey-900;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     @apply bg-brand-grey-300 rounded;
   }
-  
+
   .dark ::-webkit-scrollbar-thumb {
     @apply bg-brand-grey-700;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-brand-grey-400;
   }
-  
+
   .dark ::-webkit-scrollbar-thumb:hover {
     @apply bg-brand-grey-600;
   }

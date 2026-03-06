@@ -3,6 +3,7 @@
 import Container from "@/components/Container";
 import ContactForm from "@/components/ContactForm";
 import { motion } from "framer-motion";
+import { useSettings } from "@/lib/settings-context";
 
 interface ContactClientProps {
   form: {
@@ -23,24 +24,70 @@ interface ContactClientProps {
   } | null;
 }
 
+
 export default function ContactClient({ form, info, expectations, successMessage }: ContactClientProps) {
+  console.log("Info :", info)
+  const { settings, loading } = useSettings();
+
+  // Safely get contact info value, ensuring it's a string
+  const getContactValue = (value: any, fallback: string = ""): string => {
+    if (value === null || value === undefined) return fallback;
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object') return fallback;
+    return String(value);
+  };
+
+  const location = [
+    getContactValue(settings?.contactInfo?.address),
+    getContactValue(settings?.contactInfo?.city, "Nashik"),
+    getContactValue(settings?.contactInfo?.state, "Maharashtra"),
+    getContactValue(settings?.contactInfo?.country, "India"),
+  ]
+    .filter(Boolean)
+    .join(", ") || info?.location || "Nashik, Maharashtra, India";
+
+  const contactCards = [
+    {
+      icon: "📧",
+      label: "Email Us",
+      value: getContactValue(settings?.contactInfo?.email, info?.email || "hello@growthvalley.com"),
+    },
+    {
+      icon: "📞",
+      label: "Phone",
+      value: getContactValue(settings?.contactInfo?.phone),
+    },
+    {
+      icon: "📍",
+      label: "Location",
+      value:
+        getContactValue(settings?.contactInfo?.city) && getContactValue(settings?.contactInfo?.country)
+          ? `${getContactValue(settings.contactInfo.city)}, ${getContactValue(settings.contactInfo.country)}`
+          : info?.location || "Nashik, Maharashtra, India",
+    },
+    {
+      icon: "⏰",
+      label: "Response Time",
+      value: "Within 24 hours",
+    },
+  ];
   return (
     <section className="relative py-20 bg-white dark:bg-brand-grey-950 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-hero-gradient" />
-      
+
       {/* Floating Elements */}
-      <motion.div 
+      <motion.div
         className="absolute -top-40 -right-40 w-96 h-96 bg-accent/5 rounded-full blur-3xl"
         animate={{ scale: [1, 1.2, 1] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute top-1/2 -left-20 w-72 h-72 bg-accent/5 rounded-full blur-3xl"
         animate={{ scale: [1.2, 1, 1.2] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       {/* Geometric Shapes */}
       <motion.div
         className="absolute top-32 right-1/4 w-4 h-4 bg-accent/30 rotate-45"
@@ -57,22 +104,17 @@ export default function ContactClient({ form, info, expectations, successMessage
         animate={{ rotate: [45, 135, 45] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       <Container className="relative z-10">
         {/* Animated Info Cards Above Form */}
-        <motion.div 
+        <motion.div
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          {[
-            { icon: "📧", label: "Email Us", value: info?.email || "hello@growthvalley.com" },
-            { icon: "📍", label: "Location", value: info?.location || "Nashik, Maharashtra, India" },
-            { icon: "⏰", label: "Response Time", value: "Within 24 hours" },
-            { icon: "💬", label: "Availability", value: "Mon-Fri, 9am-6pm IST" },
-          ].map((item, index) => (
+          {contactCards.map((item, index) => (
             <motion.div
               key={index}
               className="bg-white dark:bg-brand-grey-900 border border-brand-grey-200 dark:border-brand-grey-800 p-6 text-center relative overflow-hidden"
@@ -82,7 +124,7 @@ export default function ContactClient({ form, info, expectations, successMessage
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -5, boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
             >
-              <motion.span 
+              <motion.span
                 className="text-3xl block mb-3"
                 whileHover={{ scale: 1.2, rotate: 10 }}
               >
@@ -97,7 +139,7 @@ export default function ContactClient({ form, info, expectations, successMessage
             </motion.div>
           ))}
         </motion.div>
-        
+
         {/* Contact Form */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -115,17 +157,37 @@ export default function ContactClient({ form, info, expectations, successMessage
             ]}
             contactInfo={{
               title: info?.title || "Direct Contact",
-              email: info?.email || "hello@growthvalley.com",
-              location: info?.location || "Nashik, Maharashtra, India",
+
+              email:
+                settings?.contactInfo?.email ||
+                info?.email ||
+                "hello@growthvalley.com",
+
+              location: location,
             }}
             expectations={{
-              title: expectations?.title || "What to Expect",
-              items: expectations?.items || [
-                "Response within one business day",
-                "Initial discovery call to understand your situation",
-                "Clear proposal with scope, timeline, and investment",
-                "No commitment required for initial conversation",
-              ],
+              title: typeof expectations?.title === 'string' ? expectations.title : "What to Expect",
+              items: Array.isArray(expectations?.items)
+                ? expectations.items
+                    .filter(item => item !== null && item !== undefined)
+                    .map(item => {
+                      if (typeof item === 'string') return item;
+                      if (typeof item === 'number') return String(item);
+                      // Handle objects that might have been accidentally stored
+                      if (typeof item === 'object' && item !== null) {
+                        if (item.value) return String(item.value);
+                        if (item.text) return String(item.text);
+                        return '';
+                      }
+                      return '';
+                    })
+                    .filter(item => item !== '') // Remove empty strings from conversion
+                : [
+                    "Response within one business day",
+                    "Initial discovery call to understand your situation",
+                    "Clear proposal with scope, timeline, and investment",
+                    "No commitment required for initial conversation",
+                  ],
             }}
             successMessage={{
               title: successMessage?.title || "Message Received",

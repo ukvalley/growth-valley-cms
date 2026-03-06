@@ -6,12 +6,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
 import { useLogo } from "@/lib/settings-context";
 
+
 const navigation = [
-  { name: "Solutions", href: "/solutions" },
+  { name: "Home", href: "/" },
+  { name: "Services", href: "/solutions" },
   { name: "Industries", href: "/industries" },
   { name: "Case Studies", href: "/case-studies" },
   { name: "Blog", href: "/blog" },
-  { name: "Company", href: "/company" },
+  { name: "About Us", href: "/company" },
 ];
 
 export default function Navbar() {
@@ -20,43 +22,48 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+
   useEffect(() => {
     setMounted(true);
-    
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <motion.header 
+    <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b transition-all duration-300 ${
-        scrolled 
-          ? 'bg-white/98 dark:bg-brand-grey-950/98 shadow-sm border-brand-grey-200 dark:border-brand-grey-800' 
-          : 'bg-white/95 dark:bg-brand-grey-950/95 border-brand-grey-200 dark:border-brand-grey-800'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b transition-all duration-300 ${scrolled
+        ? 'bg-white/98 dark:bg-brand-grey-950/98 shadow-sm border-brand-grey-200 dark:border-brand-grey-800'
+        : 'bg-white/95 dark:bg-brand-grey-950/95 border-brand-grey-200 dark:border-brand-grey-800'
+        }`}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             {mounted && hasLogo && logo ? (
-              <motion.img 
-                src={logo} 
+              <motion.img
+                src={logo}
                 alt={siteName}
-                className="h-8 w-auto"
+                // className="h-10 w-auto"
+                className="h-20 w-32 md:w-40 lg:w-48 object-contain"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               />
             ) : (
-              <motion.span 
+              <motion.span
                 className="text-2xl font-semibold tracking-tight text-brand-black dark:text-white"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { testimonialAPI, mediaAPI } from '@/lib/admin-api';
 import AdminLayout from '../../AdminLayout';
+import { getImageUrl } from '@/lib/utils';
 
 interface Testimonial {
   _id: string;
@@ -224,9 +225,8 @@ export default function EditTestimonialPage() {
                   <div className="border-2 border-dashed border-brand-grey-300 dark:border-brand-grey-700 rounded-lg p-6 text-center">
                     {formData.avatar ? (
                       <div className="relative inline-block">
-                        {/* <img src={formData.avatar} alt="Avatar" className="w-24 h-24 object-cover rounded-full" /> */}
                         <img
-                          src={`http://localhost:3001${formData.avatar}`}
+                          src={getImageUrl(formData.avatar)}
                           alt="Avatar"
                           className="w-24 h-24 object-cover rounded-full"
                         />

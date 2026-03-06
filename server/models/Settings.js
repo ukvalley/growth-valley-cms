@@ -109,6 +109,10 @@ const settingsSchema = new mongoose.Schema({
   maintenanceMode: {
     type: Boolean,
     default: false
+  },
+  favicon: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true,
@@ -116,7 +120,7 @@ const settingsSchema = new mongoose.Schema({
 });
 
 // Ensure only one settings document exists
-settingsSchema.statics.getSingleton = async function() {
+settingsSchema.statics.getSingleton = async function () {
   let settings = await this.findOne();
   if (!settings) {
     settings = await this.create({});
@@ -125,7 +129,7 @@ settingsSchema.statics.getSingleton = async function() {
 };
 
 // Transform output - include _id for API responses
-settingsSchema.methods.toJSON = function() {
+settingsSchema.methods.toJSON = function () {
   const settings = this.toObject();
   delete settings.__v;
   return settings;

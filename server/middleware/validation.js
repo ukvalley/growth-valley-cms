@@ -16,20 +16,20 @@ const validateBody = (schema) => {
       abortEarly: false,
       stripUnknown: true
     });
-    
+
     if (error) {
       const errors = error.details.map(detail => ({
         field: detail.path.join('.'),
         message: detail.message
       }));
-      
+
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
         errors
       });
     }
-    
+
     req.body = value;
     next();
   };
@@ -44,20 +44,20 @@ const validateQuery = (schema) => {
       abortEarly: false,
       stripUnknown: true
     });
-    
+
     if (error) {
       const errors = error.details.map(detail => ({
         field: detail.path.join('.'),
         message: detail.message
       }));
-      
+
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
         errors
       });
     }
-    
+
     req.query = value;
     next();
   };
@@ -72,20 +72,20 @@ const validateParams = (schema) => {
       abortEarly: false,
       stripUnknown: true
     });
-    
+
     if (error) {
       const errors = error.details.map(detail => ({
         field: detail.path.join('.'),
         message: detail.message
       }));
-      
+
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
         errors
       });
     }
-    
+
     req.params = value;
     next();
   };
@@ -104,14 +104,14 @@ const schemas = {
       'any.required': 'Password is required'
     })
   }),
-  
+
   forgotPassword: Joi.object({
     email: Joi.string().email().required().messages({
       'string.email': 'Please enter a valid email address',
       'any.required': 'Email is required'
     })
   }),
-  
+
   resetPassword: Joi.object({
     token: Joi.string().required(),
     password: Joi.string()
@@ -128,7 +128,7 @@ const schemas = {
       'any.required': 'Please confirm your password'
     })
   }),
-  
+
   // Blog schemas
   createBlog: Joi.object({
     title: Joi.string().max(200).required(),
@@ -149,7 +149,7 @@ const schemas = {
       canonicalUrl: Joi.string().allow(null, '')
     })
   }),
-  
+
   updateBlog: Joi.object({
     title: Joi.string().max(200),
     slug: Joi.string().pattern(/^[a-z0-9-]+$/),
@@ -169,7 +169,7 @@ const schemas = {
       canonicalUrl: Joi.string().allow(null, '')
     })
   }),
-  
+
   // Case Study schemas
   createCaseStudy: Joi.object({
     title: Joi.string().max(200).required(),
@@ -204,18 +204,41 @@ const schemas = {
       canonicalUrl: Joi.string().allow(null, '')
     })
   }),
-  
+
   // Contact/Enquiry schemas
   contactForm: Joi.object({
-    name: Joi.string().max(100).required(),
-    email: Joi.string().email().required(),
-    phone: Joi.string().required(),
-    company: Joi.string().max(200).required(),
-    service: Joi.string().valid('Lead Generation', 'Marketing Automation', 'CRM Implementation', 'Sales Funnel Optimization', 'Growth Consulting', 'Other'),
-    message: Joi.string().max(2000).required(),
+    name: Joi.string()
+      .pattern(/^[A-Za-z\s\-'\.]+$/)
+      .max(100)
+      .required()
+      .messages({
+        'string.pattern.base': 'Name should contain only letters, spaces, hyphens, and apostrophes',
+        'string.max': 'Name cannot exceed 100 characters',
+        'any.required': 'Name is required'
+      }),
+    email: Joi.string()
+      .email()
+      .required()
+      .messages({
+        'string.email': 'Please enter a valid email address',
+        'any.required': 'Email is required'
+      }),
+    phone: Joi.string()
+      .allow('')
+      .max(50)
+      .messages({
+        'string.max': 'Phone number cannot exceed 50 characters'
+      }),
+    company: Joi.string().max(200).allow(''),
+    service: Joi.string().valid('Lead Generation', 'Marketing Automation', 'CRM Implementation', 'Sales Funnel Optimization', 'Growth Consulting', 'Other', 'revenue-architecture', 'sales-process', 'revops', 'gtm', 'other').allow(''),
+    interest: Joi.string().allow(''),
+    message: Joi.string().max(2000).required().messages({
+      'string.max': 'Message cannot exceed 2000 characters',
+      'any.required': 'Message is required'
+    }),
     source: Joi.string().valid('website', 'referral', 'social', 'direct', 'other')
   }),
-  
+
   updateEnquiry: Joi.object({
     status: Joi.string().valid('new', 'contacted', 'qualified', 'proposal', 'negotiation', 'closed', 'lost'),
     priority: Joi.string().valid('low', 'medium', 'high', 'urgent'),
@@ -224,7 +247,7 @@ const schemas = {
     tags: Joi.array().items(Joi.string()),
     note: Joi.string().max(1000)
   }),
-  
+
   // Settings schema
   settings: Joi.object({
     siteName: Joi.string(),
@@ -279,7 +302,7 @@ const schemas = {
     customJs: Joi.string().allow(''),
     maintenanceMode: Joi.boolean()
   }),
-  
+
   // Page SEO schema
   pageSeo: Joi.object({
     pageTitle: Joi.string().max(100).required(),
@@ -296,7 +319,7 @@ const schemas = {
     })),
     isActive: Joi.boolean()
   }),
-  
+
   // Pagination schema
   pagination: Joi.object({
     page: Joi.number().integer().min(1).default(1),
@@ -305,17 +328,17 @@ const schemas = {
     order: Joi.string().valid('asc', 'desc').default('desc'),
     search: Joi.string().allow('')
   }),
-  
+
   // Slug param schema
   slugParam: Joi.object({
     slug: Joi.string().pattern(/^[a-z0-9-]+$/).required()
   }),
-  
+
   // ID param schema
   idParam: Joi.object({
     id: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required()
   }),
-  
+
   // Page param schema
   pageParam: Joi.object({
     page: Joi.string().valid('home', 'solutions', 'industries', 'case-studies', 'company', 'contact', 'blog').required()

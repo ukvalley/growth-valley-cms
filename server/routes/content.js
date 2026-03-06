@@ -50,5 +50,5 @@ router.put('/:page/seo', protect, contentController.updateSEO);
 // @route   DELETE /api/content/:page/:section
 // @desc    Delete a section from a page
 router.delete('/:page/:section', protect, contentController.deleteSectionContent);
-
+router.delete('/:page', protect, contentController.deleteContentByPage);
 module.exports = router;

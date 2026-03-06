@@ -48,6 +48,7 @@ interface SiteSettings {
     metaDescription: string;
     keywords: string[];
   };
+  favicon: string;
 }
 
 export default function SettingsPage() {
@@ -56,8 +57,10 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [uploadingLight, setUploadingLight] = useState(false);
   const [uploadingDark, setUploadingDark] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
   const lightLogoRef = useRef<HTMLInputElement>(null);
   const darkLogoRef = useRef<HTMLInputElement>(null);
+  const faviconRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<SiteSettings>({
     siteName: '',
@@ -69,9 +72,10 @@ export default function SettingsPage() {
     hero: { title: '', subtitle: '', ctaText: '', ctaLink: '' },
     footer: { copyrightText: '' },
     seo: { metaTitle: '', metaDescription: '', keywords: [] },
+    favicon: '',
   });
   const [keywordsInput, setKeywordsInput] = useState('');
-  
+
   // Helper to get full URL for preview
   const getFullUrl = (path: string | undefined) => {
     if (!path) return '';
@@ -98,6 +102,7 @@ export default function SettingsPage() {
           hero: response.data.hero || { title: '', subtitle: '', ctaText: '', ctaLink: '' },
           footer: response.data.footer || { copyrightText: '' },
           seo: response.data.seo || { metaTitle: '', metaDescription: '', keywords: [] },
+          favicon: response.data.favicon || '',
         });
         setKeywordsInput((response.data.seo?.keywords || []).join(', '));
       }
@@ -108,35 +113,76 @@ export default function SettingsPage() {
     }
   };
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'logoDark') => {
+  // const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'logoDark'|'favicon') => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+
+  //   if (type === 'logo') {
+  //     setUploadingLight(true);
+  //   } else {
+  //     setUploadingDark(true);
+  //   }
+
+  //   try {
+  //     const response = await mediaAPI.upload(file, 'logos');
+  //     if (response.success && response.data?.url) {
+  //       setFormData(prev => ({
+  //         ...prev,
+  //         businessInfo: {
+  //           ...prev.businessInfo,
+  //           [type]: response.data.url,
+  //         },
+  //       }));
+  //     }
+  //   } catch (error: any) {
+  //     alert(error.message || 'Failed to upload logo');
+  //   } finally {
+  //     if (type === 'logo') {
+  //       setUploadingLight(false);
+  //     } else {
+  //       setUploadingDark(false);
+  //     }
+  //   }
+  // };
+
+  const handleLogoUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: 'logo' | 'logoDark' | 'favicon'
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (type === 'logo') {
-      setUploadingLight(true);
-    } else {
-      setUploadingDark(true);
-    }
+    if (type === 'logo') setUploadingLight(true);
+    if (type === 'logoDark') setUploadingDark(true);
+    if (type === 'favicon') setUploadingFavicon(true);
 
     try {
       const response = await mediaAPI.upload(file, 'logos');
+
       if (response.success && response.data?.url) {
-        setFormData(prev => ({
-          ...prev,
-          businessInfo: {
-            ...prev.businessInfo,
-            [type]: response.data.url,
-          },
-        }));
+        if (type === 'favicon') {
+          // Favicon is stored at root level
+          setFormData(prev => ({
+            ...prev,
+            favicon: response.data.url,
+          }));
+        } else {
+          // Logos are stored in businessInfo
+          setFormData(prev => ({
+            ...prev,
+            businessInfo: {
+              ...prev.businessInfo,
+              [type]: response.data.url,
+            },
+          }));
+        }
       }
     } catch (error: any) {
-      alert(error.message || 'Failed to upload logo');
+      alert(error.message || 'Upload failed');
     } finally {
-      if (type === 'logo') {
-        setUploadingLight(false);
-      } else {
-        setUploadingDark(false);
-      }
+      setUploadingLight(false);
+      setUploadingDark(false);
+      setUploadingFavicon(false);
     }
   };
 
@@ -153,7 +199,8 @@ export default function SettingsPage() {
         },
       };
 
-      await settingsAPI.update(data);
+      const response = await settingsAPI.update(data);
+      console.log("Seting Update Response : ", response)
       alert('Settings saved successfully!');
     } catch (error: any) {
       alert(error.message || 'Failed to save settings');
@@ -187,7 +234,7 @@ export default function SettingsPage() {
             <p className="text-sm text-brand-grey-500 dark:text-brand-grey-400 mb-6">
               Upload light and dark versions of your logo. The light logo is used on dark backgrounds, dark logo on light backgrounds.
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Light Logo (for dark backgrounds) */}
               <div>
@@ -355,6 +402,60 @@ export default function SettingsPage() {
               </div>
             )}
           </div>
+          {/* Favicon Settings */}
+          <div className="bg-white dark:bg-brand-grey-900 p-6 rounded-lg border border-brand-grey-200 dark:border-brand-grey-800">
+            <h2 className="text-lg font-semibold mb-4">Favicon</h2>
+
+            <div className="border-2 border-dashed rounded-lg p-4">
+              {formData.favicon ? (
+                <div className="text-center">
+                  <img
+                    src={getFullUrl(formData.favicon)}
+                    className="h-12 w-12 mx-auto object-contain"
+                  />
+
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      type="button"
+                      onClick={() => faviconRef.current?.click()}
+                      className="flex-1 border rounded-lg py-2"
+                    >
+                      Replace
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData(prev => ({
+                          ...prev,
+                          favicon: '',
+                        }))
+                      }
+                      className="border border-red-400 text-red-500 px-3 rounded-lg"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => faviconRef.current?.click()}
+                  className="w-full py-10 text-center"
+                >
+                  {uploadingFavicon ? 'Uploading...' : 'Upload Favicon'}
+                </button>
+              )}
+
+              <input
+                ref={faviconRef}
+                type="file"
+                accept="image/png,image/x-icon,image/svg+xml"
+                onChange={(e) => handleLogoUpload(e, 'favicon')}
+                className="hidden"
+              />
+            </div>
+          </div>
 
           {/* General Settings */}
           <div className="bg-white dark:bg-brand-grey-900 p-6 rounded-lg border border-brand-grey-200 dark:border-brand-grey-800">
@@ -419,6 +520,30 @@ export default function SettingsPage() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">Alternate Phone</label>
+                <input
+                  type="text"
+                  value={formData.contactInfo.alternatePhone}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    contactInfo: { ...prev.contactInfo, alternatePhone: e.target.value },
+                  }))}
+                  className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">Address</label>
+                <input
+                  type="text"
+                  value={formData.contactInfo.address}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    contactInfo: { ...prev.contactInfo, address: e.target.value },
+                  }))}
+                  className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">City</label>
                 <input
                   type="text"
@@ -438,6 +563,30 @@ export default function SettingsPage() {
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
                     contactInfo: { ...prev.contactInfo, state: e.target.value },
+                  }))}
+                  className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">Country</label>
+                <input
+                  type="text"
+                  value={formData.contactInfo.country}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    contactInfo: { ...prev.contactInfo, country: e.target.value },
+                  }))}
+                  className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-brand-black dark:text-white mb-2">Zip Code</label>
+                <input
+                  type="text"
+                  value={formData.contactInfo.zipCode}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    contactInfo: { ...prev.contactInfo, zipCode: e.target.value },
                   }))}
                   className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-800 text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
                 />

@@ -19,12 +19,20 @@ module.exports = {
   adminPassword: process.env.ADMIN_PASSWORD || 'ChangeThisPassword123!',
 
   // Email
+  // smtp: {
+  //   host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  //   port: parseInt(process.env.SMTP_PORT, 10) || 587,
+  //   user: process.env.SMTP_USER || '',
+  //   pass: process.env.SMTP_PASS || '',
+  //   from: process.env.EMAIL_FROM || 'Growth Valley <noreply@growthvalley.com>'
+  // },
+
   smtp: {
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT, 10) || 587,
-    user: process.env.SMTP_USER || '',
-    pass: process.env.SMTP_PASS || '',
-    from: process.env.EMAIL_FROM || 'Growth Valley <noreply@growthvalley.com>'
+    host: `smtp.gmail.com`,
+    port: 587,
+    user: 'abhishekgangurde046@gmail.com',
+    pass: 'yehx pbja nawo qpye',
+    from: 'abhishekgangurde046@gmail.com'
   },
 
   // Password Reset

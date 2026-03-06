@@ -30,10 +30,12 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
+    setErrorMessage("");
 
     try {
       const response = await fetch("/api/contact", {
@@ -43,6 +45,8 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
         },
         body: JSON.stringify(formData),
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         setStatus("success");
@@ -56,9 +60,16 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
         });
       } else {
         setStatus("error");
+        // Extract error message from response
+        const message = data.message || data.error ||
+          (data.errors && Array.isArray(data.errors)
+            ? data.errors.map((e: { field?: string; message?: string }) => e.message || e.field || String(e)).join(". ")
+            : "Something went wrong. Please try again.");
+        setErrorMessage(message);
       }
     } catch (error) {
       setStatus("error");
+      setErrorMessage("Unable to connect to the server. Please try again later.");
     }
   };
 
@@ -67,6 +78,11 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user modifies the form
+    if (status === "error") {
+      setStatus("idle");
+      setErrorMessage("");
+    }
   };
 
   return (
@@ -115,10 +131,27 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
                   id="name"
                   name="name"
                   value={formData.name}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    // Only allow letters, spaces, hyphens, and apostrophes
+                    const value = e.target.value.replace(/[^A-Za-z\s\-'\.]/g, '');
+                    setFormData(prev => ({ ...prev, name: value }));
+                    // Clear error when user modifies the form
+                    if (status === "error") {
+                      setStatus("idle");
+                      setErrorMessage("");
+                    }
+                  }}
                   required
+                  pattern="^[A-Za-z\s\-'\.]+$"
+                  title="Name should contain only letters, spaces, hyphens, and apostrophes"
                   className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-900 text-brand-black dark:text-white focus:border-accent focus:outline-none"
                   placeholder="John Smith"
+                  onInvalid={(e) => {
+                    e.currentTarget.setCustomValidity("Name should contain only letters and spaces (no numbers or special characters)");
+                  }}
+                  onInput={(e) => {
+                    e.currentTarget.setCustomValidity("");
+                  }}
                 />
               </div>
               <div>
@@ -153,6 +186,9 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
                   type="text"
                   id="company"
                   name="company"
+                  minLength={2}
+                  maxLength={50}
+                  pattern="^[A-Za-z0-9&.\-\s]+$"
                   value={formData.company}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-900 text-brand-black dark:text-white focus:border-accent focus:outline-none"
@@ -166,14 +202,39 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
                 >
                   Phone
                 </label>
+
                 <input
                   type="tel"
                   id="phone"
                   name="phone"
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    // Allow only digits and optional +
+                    const value = e.target.value.replace(/[^0-9+]/g, '');
+                    setFormData(prev => ({ ...prev, phone: value }));
+
+                    if (status === "error") {
+                      setStatus("idle");
+                      setErrorMessage("");
+                    }
+                  }}
+
+                  /* ✅ Indian Mobile Validation */
+                  pattern="^(\+91|91)?[6-9]\d{9}$"
+                  title="Enter a valid Indian mobile number (e.g., 9876543210 or +919876543210)"
+
                   className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-900 text-brand-black dark:text-white focus:border-accent focus:outline-none"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="9876543210"
+
+                  onInvalid={(e) => {
+                    e.currentTarget.setCustomValidity(
+                      "Please enter a valid Indian mobile number"
+                    );
+                  }}
+
+                  onInput={(e) => {
+                    e.currentTarget.setCustomValidity("");
+                  }}
                 />
               </div>
             </div>
@@ -189,6 +250,7 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
                 id="interest"
                 name="interest"
                 value={formData.interest}
+                required
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-900 text-brand-black dark:text-white focus:border-accent focus:outline-none"
               >
@@ -199,6 +261,7 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
                   </option>
                 ))}
               </select>
+
             </div>
 
             <div>
@@ -222,7 +285,7 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
 
             {status === "error" && (
               <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-body-sm">
-                Something went wrong. Please try again or email us directly.
+                {errorMessage || "Something went wrong. Please try again or email us directly."}
               </div>
             )}
 
@@ -263,12 +326,16 @@ export default function ContactForm({ interests, contactInfo, expectations, succ
         </div>
 
         <div className="bg-brand-black dark:bg-brand-grey-800 p-8 text-white">
-          <h3 className="text-heading-3 mb-4">{expectations.title}</h3>
+          <h3 className="text-heading-3 mb-4">
+            {typeof expectations?.title === 'string' ? expectations.title : "What to Expect"}
+          </h3>
           <ul className="space-y-4">
-            {expectations.items.map((item, idx) => (
+            {(Array.isArray(expectations?.items) ? expectations.items : []).map((item, idx) => (
               <li key={idx} className="flex items-start gap-3">
                 <span className="text-accent mt-1">✓</span>
-                <span className="text-body-sm">{item}</span>
+                <span className="text-body-sm">
+                  {typeof item === 'string' ? item : typeof item === 'number' ? String(item) : ''}
+                </span>
               </li>
             ))}
           </ul>

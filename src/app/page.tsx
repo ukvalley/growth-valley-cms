@@ -48,25 +48,61 @@ async function getClients() {
   }
 }
 
+// Fetch featured case studies from API and transform for home page
+async function getFeaturedCaseStudies() {
+  try {
+    const res = await fetch(`${API_URL}/api/case-studies/featured?limit=2`, {
+      cache: 'no-store'
+    });
+    const data = await res.json();
+
+    if (!data.success || !data.data) {
+      return [];
+    }
+
+    // Transform case studies to match component format
+    return data.data.map((study: any) => ({
+      client: study.clientName,
+      industry: study.industry,
+      result: study.results?.[0]?.value || study.results?.[0]?.metric || '',
+      description: study.challenge,
+      link: `/case-studies/${study.slug}`
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export default async function Home() {
   // Fetch dynamic content
   const content = await getPageContent('home');
-  
-  // Fetch testimonials and clients
-  const [testimonials, clients] = await Promise.all([
+
+  // Fetch testimonials, clients, and featured case studies in parallel
+  const [testimonials, clients, featuredCaseStudies] = await Promise.all([
     getTestimonials(),
-    getClients()
+    getClients(),
+    getFeaturedCaseStudies()
   ]);
-  
-  // Extract sections
+
+  // Extract sections from content
   const hero = getSection(content, 'hero');
   const stats = getSection(content, 'stats');
   const problems = getSection(content, 'problems');
   const solutions = getSection(content, 'solutions');
   const industries = getSection(content, 'industries');
-  const caseStudyPreview = getSection(content, 'caseStudyPreview');
+  const caseStudyPreviewContent = getSection(content, 'caseStudyPreview');
   const process = getSection(content, 'process');
   const cta = getSection(content, 'cta');
+
+  // Merge CMS content with dynamic case studies
+  // Use featured case studies from database if available, otherwise fall back to CMS content
+  const caseStudyPreview = {
+    title: caseStudyPreviewContent?.title || 'Results',
+    subtitle: caseStudyPreviewContent?.subtitle || 'Real transformations. Real numbers.',
+    items: featuredCaseStudies.length > 0
+      ? featuredCaseStudies
+      : (caseStudyPreviewContent?.items || [])
+  };
 
   return (
     <>

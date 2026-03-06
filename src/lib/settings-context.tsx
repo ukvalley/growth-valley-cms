@@ -63,6 +63,7 @@ interface SiteSettings {
   customCss: string;
   customJs: string;
   maintenanceMode: boolean;
+  favicon: string;
 }
 
 interface SettingsContextType {
@@ -121,14 +122,15 @@ const defaultSettings: SiteSettings = {
   customCss: '',
   customJs: '',
   maintenanceMode: false,
+  favicon: '',
 };
 
 // Deep merge utility for nested objects
 function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T> | undefined): T {
   if (!source) return target;
-  
+
   const result = { ...target };
-  
+
   for (const key in source) {
     if (source[key] !== undefined && source[key] !== null) {
       if (
@@ -143,50 +145,76 @@ function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T> 
       }
     }
   }
-  
+
   return result;
 }
 
 const SettingsContext = createContext<SettingsContextType>({
   settings: defaultSettings,
   loading: true,
-  refetch: async () => {},
+  refetch: async () => { },
 });
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // const fetchSettings = async () => {
+  //   try {
+  //     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  //     const response = await fetch(`${apiUrl}/api/settings`, {
+  //       cache: 'no-store',
+  //       headers: {
+  //         'Cache-Control': 'no-cache',
+  //       },
+  //     });
+  //     console.log("Setting Response : ", response)
+
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       if (data.success && data.data) {
+  //         // Deep merge with defaults to ensure all fields exist
+  //         const mergedSettings = deepMerge(defaultSettings, data.data);
+  //         setSettings(mergedSettings);
+  //       } else {
+  //         setSettings(defaultSettings);
+  //       }
+  //     } else {
+  //       setSettings(defaultSettings);
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to fetch settings:', error);
+  //     setSettings(defaultSettings);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchSettings = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const response = await fetch(`${apiUrl}/api/settings`, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          // Deep merge with defaults to ensure all fields exist
-          const mergedSettings = deepMerge(defaultSettings, data.data);
-          setSettings(mergedSettings);
-        } else {
-          setSettings(defaultSettings);
-        }
-      } else {
-        setSettings(defaultSettings);
+      console.log("URL : ", process.env.NEXT_PUBLIC_API_URL)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/settings`,
+        { cache: "no-store" }
+      );
+
+      const result = await response.json();
+
+      console.log("API SETTINGS:", result);
+
+      if (result.success) {
+        setSettings({
+          ...defaultSettings,
+          ...result.data,
+        });
       }
-    } catch (error) {
-      console.error('Failed to fetch settings:', error);
+    } catch (err) {
+      console.error(err);
       setSettings(defaultSettings);
     } finally {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -214,7 +242,7 @@ export function useLogo() {
 
   useEffect(() => {
     setMounted(true);
-    
+
     // Check if dark mode is active
     const checkDark = () => {
       const isDarkMode = document.documentElement.classList.contains('dark');

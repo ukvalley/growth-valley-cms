@@ -32,7 +32,7 @@ exports.updateSettings = async (req, res) => {
       'siteName', 'siteTagline', 'siteDescription',
       'contactInfo', 'socialLinks', 'hero', 'footer',
       'businessInfo', 'seo', 'tracking', 'customCss', 'customJs',
-      'maintenanceMode',
+      'maintenanceMode', 'favicon',
     ];
 
     allowedUpdates.forEach((field) => {

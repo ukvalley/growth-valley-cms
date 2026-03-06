@@ -1,18 +1,43 @@
 import PageHeader from "@/components/PageHeader";
+import { getPageContent, getSection, getPageSEO } from "@/lib/content";
 import { Metadata } from "next";
 import CaseStudiesClient from "./CaseStudiesClient";
 
-export const metadata: Metadata = {
-  title: "Case Studies",
-  description: "Real transformations. Real numbers. See how we've helped B2B companies achieve predictable revenue growth.",
-};
-
 export const dynamic = 'force-dynamic';
 
-async function getCaseStudies() {
+// Interface for case study from database
+interface CaseStudy {
+  _id?: string;
+  slug: string;
+  title: string;
+  industry: string;
+  challenge?: string;
+  featured?: boolean;
+  featuredImage?: string;
+  clientLogo?: string;
+  results?: Array<{ value: string; metric: string }>;
+}
+
+// Interface for header section
+interface HeaderSection {
+  breadcrumbTitle: string;
+  title: string;
+  description: string;
+}
+
+// Interface for CTA section
+interface CTASection {
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonLink?: string;
+}
+
+async function getCaseStudies(): Promise<CaseStudy[]> {
   try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "http://localhost:3001";
     const res = await fetch(
-      `${process.env.API_URL || "http://localhost:3001"}/api/case-studies`,
+      `${apiUrl}/api/case-studies`,
       { cache: "no-store" }
     );
     if (!res.ok) return [];
@@ -24,22 +49,39 @@ async function getCaseStudies() {
   }
 }
 
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getPageContent('casestudies');
+  const seo = getPageSEO(content, 'casestudies');
+  return {
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+  };
+}
+
 export default async function CaseStudiesPage() {
+  // Fetch page content from CMS
+  const content = await getPageContent('casestudies');
+  const header = getSection<HeaderSection>(content, 'header');
+  const cta = getSection<CTASection>(content, 'cta');
+
+  // Fetch case study items from database
   const caseStudies = await getCaseStudies();
-  const featuredCaseStudies = caseStudies.filter((cs: any) => cs.featured);
-  const otherCaseStudies = caseStudies.filter((cs: any) => !cs.featured);
+  const featuredCaseStudies = caseStudies.filter((cs) => cs.featured);
+  const otherCaseStudies = caseStudies.filter((cs) => !cs.featured);
 
   return (
     <>
       <PageHeader
-        title="Case Studies"
-        description="Real transformations. Real numbers. See how we've helped B2B companies achieve predictable revenue growth."
-        breadcrumb={[{ label: "Case Studies", href: "/case-studies" }]}
+        title={header?.title || "Case Studies"}
+        description={header?.description || "Real transformations. Real numbers. See how we've helped B2B companies achieve predictable revenue growth."}
+        breadcrumb={[{ label: header?.breadcrumbTitle || "Case Studies", href: "/case-studies" }]}
       />
-      <CaseStudiesClient 
+      <CaseStudiesClient
         featuredCaseStudies={featuredCaseStudies}
         otherCaseStudies={otherCaseStudies}
         caseStudies={caseStudies}
+        cta={cta}
       />
     </>
   );

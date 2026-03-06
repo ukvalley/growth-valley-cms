@@ -17,12 +17,11 @@ interface PageSummary {
 
 const pageInfo: Record<string, { name: string; description: string }> = {
   home: { name: 'Home', description: 'Main landing page hero, stats, solutions, industries, and CTA sections' },
-  about: { name: 'About', description: 'About page mission, origin, values, and approach' },
+  company: { name: 'Company (About)', description: 'Company/About page mission, origin, values, and approach' },
   services: { name: 'Services', description: 'Services/solutions offered with features and outcomes' },
   industries: { name: 'Industries', description: 'Industry expertise pages with challenges and results' },
-  'case-studies': { name: 'Case Studies', description: 'Case studies listing page hero and filter options' },
+  casestudies: { name: 'Case Studies', description: 'Case studies page header and CTA sections' },
   contact: { name: 'Contact', description: 'Contact page form, info, and expectations' },
-  company: { name: 'Company', description: 'Company page mission, origin, values, and approach' },
   privacy: { name: 'Privacy Policy', description: 'Privacy policy page with legal content and sections' },
   terms: { name: 'Terms & Conditions', description: 'Terms and conditions page with legal agreements' },
 };
@@ -41,6 +40,7 @@ export default function ContentManagementPage() {
       setLoading(true);
       const response = await contentAPI.getAllPages();
       if (response.success) {
+        console.log("ALL PAGES FROM API:", response.data);
         setPages(response.data);
       }
     } catch (err: any) {
@@ -69,7 +69,7 @@ export default function ContentManagementPage() {
     <AdminLayout>
       <div className="p-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        {/* <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-heading-1 text-brand-black dark:text-white mb-2">Content Management</h1>
             <p className="text-body text-brand-grey-500 dark:text-brand-grey-400">
@@ -85,8 +85,40 @@ export default function ContentManagementPage() {
             </svg>
             Back to Dashboard
           </Link>
-        </div>
+        </div> */}
 
+        <div className="mb-6 sm:mb-8 flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between">
+          {/* Content Title + Description */}
+          <div className="mt-3 sm:mt-0">
+            <h1 className="text-2xl sm:text-heading-1 text-brand-black dark:text-white mb-1 sm:mb-2">
+              Content Management
+            </h1>
+            <p className="text-sm sm:text-body text-brand-grey-500 dark:text-brand-grey-400">
+              Manage all page content dynamically. Edit sections, update text, and customize your site.
+            </p>
+          </div>
+
+          {/* Back to Dashboard Link */}
+          <Link
+            href="/admin"
+            className="mb-2 sm:mb-0 px-3 sm:px-4 py-2 sm:py-2.5 border border-brand-grey-300 dark:border-brand-grey-700 text-sm sm:text-base text-brand-black dark:text-white rounded-lg hover:border-accent transition-colors flex items-center gap-2"
+          >
+            <svg
+              className="w-4 h-4 sm:w-4 sm:h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
+              />
+            </svg>
+            Back to Dashboard
+          </Link>
+        </div>
         {/* Error Alert */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -106,7 +138,7 @@ export default function ContentManagementPage() {
         ) : (
           /* Pages Grid */
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {pages.map((page) => {
+            {pages.filter((page) => page.exists).map((page) => {
               const info = getPageInfo(page.page);
               return (
                 <Link
@@ -136,11 +168,11 @@ export default function ContentManagementPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
                   </div>
-                  
+
                   <p className="text-body-sm text-brand-grey-500 dark:text-brand-grey-400 mb-4 line-clamp-2">
                     {info.description}
                   </p>
-                  
+
                   <div className="flex items-center justify-between text-xs text-brand-grey-400 dark:text-brand-grey-500">
                     <span>Updated: {formatDate(page.updatedAt)}</span>
                     {page.seo?.metaTitle && (

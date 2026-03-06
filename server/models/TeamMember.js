@@ -19,6 +19,10 @@ const teamMemberSchema = new mongoose.Schema({
     type: String, // URL to image
     default: '',
   },
+  phone: {
+    type: String,
+    trim: true,
+  },
   linkedin: {
     type: String,
     trim: true,

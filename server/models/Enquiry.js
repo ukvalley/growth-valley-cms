@@ -16,18 +16,20 @@ const enquirySchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: [true, 'Phone number is required'],
-    trim: true
+    required: false,
+    trim: true,
+    default: ''
   },
   company: {
     type: String,
-    required: [true, 'Company name is required'],
+    required: false,
     trim: true,
-    maxlength: [200, 'Company name cannot exceed 200 characters']
+    maxlength: [200, 'Company name cannot exceed 200 characters'],
+    default: ''
   },
   service: {
     type: String,
-    enum: ['Lead Generation', 'Marketing Automation', 'CRM Implementation', 'Sales Funnel Optimization', 'Growth Consulting', 'Other'],
+    enum: ['Lead Generation', 'Marketing Automation', 'CRM Implementation', 'Sales Funnel Optimization', 'Growth Consulting', 'Other', 'revenue-architecture', 'sales-process', 'revops', 'gtm', 'other'],
     default: 'Other'
   },
   message: {

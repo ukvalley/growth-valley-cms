@@ -58,7 +58,7 @@ const contentSchema = new mongoose.Schema({
 contentSchema.index({ page: 1 }, { unique: true });
 
 // Transform output
-contentSchema.methods.toJSON = function() {
+contentSchema.methods.toJSON = function () {
   const content = this.toObject();
   delete content.__v;
   delete content._id;
@@ -66,7 +66,7 @@ contentSchema.methods.toJSON = function() {
 };
 
 // Static method to get content for a page with defaults
-contentSchema.statics.getPageContent = async function(page, defaultValue = {}) {
+contentSchema.statics.getPageContent = async function (page, defaultValue = {}) {
   const content = await this.findOne({ page: page.toLowerCase() });
   if (content) {
     return content;
@@ -76,12 +76,12 @@ contentSchema.statics.getPageContent = async function(page, defaultValue = {}) {
 };
 
 // Static method to get all pages
-contentSchema.statics.getAllPages = async function() {
+contentSchema.statics.getAllPages = async function () {
   return this.find({}).select('page seo updatedAt').sort({ page: 1 });
 };
 
 // Static method to update a section
-contentSchema.statics.updateSection = async function(page, sectionName, sectionData, adminId) {
+contentSchema.statics.updateSection = async function (page, sectionName, sectionData, adminId) {
   const update = {
     $set: {
       [`sections.${sectionName}`]: sectionData,
@@ -89,12 +89,12 @@ contentSchema.statics.updateSection = async function(page, sectionName, sectionD
       updatedBy: adminId
     }
   };
-  
+
   return this.findOneAndUpdate(
     { page: page.toLowerCase() },
     update,
-    { 
-      new: true, 
+    {
+      new: true,
       upsert: true,
       setDefaultsOnInsert: true
     }
@@ -102,7 +102,7 @@ contentSchema.statics.updateSection = async function(page, sectionName, sectionD
 };
 
 // Static method to delete a section
-contentSchema.statics.deleteSection = async function(page, sectionName) {
+contentSchema.statics.deleteSection = async function (page, sectionName) {
   return this.findOneAndUpdate(
     { page: page.toLowerCase() },
     {
@@ -142,15 +142,48 @@ const defaultContentStructures = {
         { title: 'Wasted Resources', description: 'High customer acquisition costs. Low retention. Revenue leaks across the funnel without visibility.' }
       ]
     },
+    // solutions: {
+    //   title: 'Our Approach',
+    //   subtitle: 'Building predictable revenue, systematically',
+    //   description: 'We don\'t offer quick fixes. We build lasting revenue systems.',
+    //   exploreButtonText: 'Explore All Solutions',
+    //   items: [
+    //     { icon: 'chart', title: 'Revenue Architecture', description: 'Design unified revenue systems with clear stages, metrics, and accountability.' },
+    //     { icon: 'process', title: 'Sales Process Design', description: 'Build scalable processes that convert leads consistently and efficiently.' },
+    //     { icon: 'team', title: 'RevOps Implementation', description: 'Unify operations across sales, marketing, and customer success.' },
+    //     { icon: 'target', title: 'Go-to-Market Strategy', description: 'Define the optimal route to market for your products and segments.' }
+    //   ]
+    // },
     solutions: {
       title: 'Our Approach',
       subtitle: 'Building predictable revenue, systematically',
       description: 'We don\'t offer quick fixes. We build lasting revenue systems.',
+      exploreButtonText: 'Explore All Solutions',
       items: [
-        { icon: 'chart', title: 'Revenue Architecture', description: 'Design unified revenue systems with clear stages, metrics, and accountability.' },
-        { icon: 'process', title: 'Sales Process Design', description: 'Build scalable processes that convert leads consistently and efficiently.' },
-        { icon: 'team', title: 'RevOps Implementation', description: 'Unify operations across sales, marketing, and customer success.' },
-        { icon: 'target', title: 'Go-to-Market Strategy', description: 'Define the optimal route to market for your products and segments.' }
+        {
+          id: 'revenue-architecture',
+          icon: 'chart',
+          title: 'Revenue Architecture',
+          description: 'Design unified revenue systems with clear stages, metrics, and accountability.'
+        },
+        {
+          id: 'sales-process',
+          icon: 'process',
+          title: 'Sales Process Design',
+          description: 'Build scalable processes that convert leads consistently and efficiently.'
+        },
+        {
+          id: 'revops',
+          icon: 'team',
+          title: 'RevOps Implementation',
+          description: 'Unify operations across sales, marketing, and customer success.'
+        },
+        {
+          id: 'gtm',
+          icon: 'target',
+          title: 'Go-to-Market Strategy',
+          description: 'Define the optimal route to market for your products and segments.'
+        }
       ]
     },
     industries: {
@@ -189,48 +222,11 @@ const defaultContentStructures = {
       buttonLink: '/contact'
     }
   },
-  
-  about: {
-    hero: {
-      title: 'About Growth Valley',
-      description: 'We help B2B companies transform fragmented revenue operations into unified, predictable growth engines.'
-    },
-    mission: {
-      title: 'Our Mission',
-      content: 'Growth Valley was founded on a simple observation: most B2B companies struggle with revenue unpredictability, not because they lack good products or talented people, but because their revenue operations are fragmented and misaligned.\n\nWe exist to change that. We build systems that enable predictable, scalable revenue growth—so leaders can focus on strategy instead of firefighting.'
-    },
-    origin: {
-      title: 'The Origin',
-      content: 'After years of leading revenue operations for high-growth B2B companies, our founding team saw the same patterns repeat: great teams hampered by broken systems. They set out to build the firm they wished existed—a partner that could diagnose the real problems and build lasting solutions.'
-    },
-    values: {
-      title: 'What We Believe',
-      subtitle: 'Our values shape how we work with clients and each other.',
-      items: [
-        { title: 'Outcomes Over Output', description: 'We measure success by business results, not deliverables. Every engagement is designed to create lasting impact.' },
-        { title: 'Systems Thinking', description: 'Revenue problems are rarely isolated. We connect the dots across your organization to find root causes.' },
-        { title: 'Practical Expertise', description: 'Our recommendations are grounded in real-world experience. No theoretical frameworks that don\'t work in practice.' },
-        { title: 'Partnership Mindset', description: 'We\'re not consultants who disappear after the presentation. We roll up our sleeves and work alongside your team.' }
-      ]
-    },
-    approach: {
-      title: 'How We Work',
-      subtitle: 'A partnership approach that creates lasting transformation.',
-      steps: [
-        { number: '01', title: 'Listen First', description: 'We start every engagement by understanding your unique context. No cookie-cutter solutions.' },
-        { number: '02', title: 'Diagnose Deeply', description: 'Surface-level fixes don\'t last. We identify root causes and systemic patterns.' },
-        { number: '03', title: 'Design Pragmatically', description: 'Theory without practice is useless. We design solutions that work in your reality.' },
-        { number: '04', title: 'Implement Together', description: 'Great strategies fail without execution. We stay until the job is done.' }
-      ]
-    },
-    cta: {
-      title: 'Let\'s Build Something Together',
-      description: 'Every transformation starts with a conversation. We\'d love to hear about your revenue challenges.',
-      buttonText: 'Schedule a Call',
-      buttonLink: '/contact'
-    }
-  },
-  
+
+  // NOTE: 'about' is now consolidated under 'company' key
+  // The frontend uses 'company' for the About/Company page
+  // This duplicate has been removed to prevent data conflicts
+
   services: {
     hero: {
       title: 'Revenue Solutions That Scale',
@@ -273,7 +269,7 @@ const defaultContentStructures = {
       buttonLink: '/contact'
     }
   },
-  
+
   industries: {
     hero: {
       title: 'Industry Expertise',
@@ -324,33 +320,21 @@ const defaultContentStructures = {
       buttonLink: '/contact'
     }
   },
-  
-  caseStudies: {
-    hero: {
+
+  casestudies: {
+    header: {
+      breadcrumbTitle: 'Case Studies',
       title: 'Case Studies',
-      description: 'Real transformations. Real results. Explore how we\'ve helped B2B companies achieve predictable revenue growth.'
-    },
-    featured: {
-      title: 'Featured Results',
-      stats: [
-        { value: '40%', label: 'Average Revenue Growth' },
-        { value: '85%', label: 'Forecast Accuracy' },
-        { value: '50+', label: 'Companies Transformed' },
-        { value: '$2B+', label: 'Revenue Influenced' }
-      ]
-    },
-    filter: {
-      industries: ['All', 'SaaS', 'Manufacturing', 'Professional Services', 'Financial Services'],
-      solutions: ['All', 'Revenue Architecture', 'Sales Process', 'RevOps', 'Go-to-Market']
+      description: 'Real transformations. Real numbers. See how we\'ve helped B2B companies achieve predictable revenue growth.'
     },
     cta: {
-      title: 'Ready to write your success story?',
-      description: 'Let\'s discuss how we can help you achieve similar results.',
-      buttonText: 'Schedule a Consultation',
+      title: 'Want results like these?',
+      description: 'Every transformation starts with a conversation. Let\'s discuss your revenue challenges.',
+      buttonText: 'Schedule a Call',
       buttonLink: '/contact'
     }
   },
-  
+
   contact: {
     hero: {
       title: 'Get in Touch',
@@ -384,7 +368,7 @@ const defaultContentStructures = {
       description: 'Thank you for reaching out. We\'ll get back to you within one business day.'
     }
   },
-  
+
   privacy: {
     hero: {
       title: 'Privacy Policy',
@@ -446,7 +430,7 @@ const defaultContentStructures = {
       buttonLink: '/contact'
     }
   },
-  
+
   terms: {
     hero: {
       title: 'Terms & Conditions',
@@ -516,7 +500,7 @@ const defaultContentStructures = {
       buttonLink: '/contact'
     }
   },
-  
+
   company: {
     hero: {
       title: 'About Growth Valley',
@@ -560,20 +544,20 @@ const defaultContentStructures = {
 };
 
 // Static method to get default content structure for a page
-contentSchema.statics.getDefaultStructure = function(page) {
+contentSchema.statics.getDefaultStructure = function (page) {
   return defaultContentStructures[page.toLowerCase()] || { sections: {}, seo: {} };
 };
 
 // Static method to get all default structures
-contentSchema.statics.getAllDefaultStructures = function() {
+contentSchema.statics.getAllDefaultStructures = function () {
   return defaultContentStructures;
 };
 
 // Static method to initialize default content for all pages
-contentSchema.statics.initializeDefaults = async function(adminId) {
+contentSchema.statics.initializeDefaults = async function (adminId) {
   const pages = Object.keys(defaultContentStructures);
   const results = [];
-  
+
   for (const page of pages) {
     const existing = await this.findOne({ page });
     if (!existing) {
@@ -586,7 +570,7 @@ contentSchema.statics.initializeDefaults = async function(adminId) {
       results.push(content);
     }
   }
-  
+
   return results;
 };
 

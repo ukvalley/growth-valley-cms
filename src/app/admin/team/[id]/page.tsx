@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { teamAPI, mediaAPI } from '@/lib/admin-api';
 import AdminLayout from '../../AdminLayout';
+import { getImageUrl } from '@/lib/utils';
 
 interface TeamMember {
   _id: string;
@@ -170,7 +171,7 @@ export default function EditTeamMemberPage() {
               <div className="border-2 border-dashed border-brand-grey-300 dark:border-brand-grey-700 rounded-lg p-6 text-center">
                 {formData.image ? (
                   <div className="relative inline-block">
-                    <img src={formData.image} alt="Profile" className="w-32 h-32 object-cover rounded-full" />
+                    <img src={getImageUrl(formData.image)} alt="Profile" className="w-32 h-32 object-cover rounded-full" />
                     <button
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, image: '' }))}

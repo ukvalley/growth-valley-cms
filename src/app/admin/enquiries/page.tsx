@@ -85,7 +85,7 @@ export default function EnquiriesPage() {
     <AdminLayout>
       <div className="p-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-4">
+        {/* <div className="flex items-center gap-4 mb-4">
           <Link href="/admin" className="text-brand-grey-500 dark:text-brand-grey-400 hover:text-brand-black dark:hover:text-white transition-colors">
             ← Back to Dashboard
           </Link>
@@ -106,8 +106,43 @@ export default function EnquiriesPage() {
             <option value="qualified">Qualified</option>
             <option value="closed">Closed</option>
           </select>
+        </div> */}
+
+        {/* Back to Dashboard */}
+        <div className="flex items-center mb-4">
+          <Link
+            href="/admin"
+            className="text-sm sm:text-base text-brand-grey-500 dark:text-brand-grey-400 hover:text-brand-black dark:hover:text-white transition-colors"
+          >
+            ← Back to Dashboard
+          </Link>
         </div>
 
+        {/* Enquiries Header + Filter */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          {/* Title and Count */}
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand-black dark:text-white">
+              Enquiries
+            </h1>
+            <p className="text-sm sm:text-base text-brand-grey-500 dark:text-brand-grey-400 mt-1">
+              {enquiries.length} total
+            </p>
+          </div>
+
+          {/* Status Dropdown */}
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="w-full sm:w-auto px-3 sm:px-4 py-2 border border-brand-grey-200 dark:border-brand-grey-700 bg-white dark:bg-brand-grey-900 text-sm sm:text-base text-brand-black dark:text-white rounded-lg focus:outline-none focus:border-accent"
+          >
+            <option value="">All Status</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="qualified">Qualified</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* List */}
           <div className="lg:col-span-2">
@@ -123,9 +158,8 @@ export default function EnquiriesPage() {
                   {enquiries.map((enquiry) => (
                     <div
                       key={enquiry._id}
-                      className={`p-4 hover:bg-brand-grey-50 dark:hover:bg-brand-grey-800 cursor-pointer ${
-                        selectedEnquiry?._id === enquiry._id ? 'bg-brand-grey-50 dark:bg-brand-grey-800' : ''
-                      }`}
+                      className={`p-4 hover:bg-brand-grey-50 dark:hover:bg-brand-grey-800 cursor-pointer ${selectedEnquiry?._id === enquiry._id ? 'bg-brand-grey-50 dark:bg-brand-grey-800' : ''
+                        }`}
                       onClick={() => setSelectedEnquiry(enquiry)}
                     >
                       <div className="flex items-center justify-between mb-2">
@@ -133,12 +167,11 @@ export default function EnquiriesPage() {
                           <span className="font-medium text-brand-black dark:text-white">{enquiry.name}</span>
                           <span className="text-brand-grey-500 dark:text-brand-grey-400 ml-2">{enquiry.company}</span>
                         </div>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          enquiry.status === 'new' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
-                          enquiry.status === 'contacted' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
-                          enquiry.status === 'qualified' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
-                          'bg-grey-100 dark:bg-brand-grey-700 text-brand-grey-700 dark:text-brand-grey-300'
-                        }`}>
+                        <span className={`px-2 py-1 text-xs rounded-full ${enquiry.status === 'new' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
+                            enquiry.status === 'contacted' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
+                              enquiry.status === 'qualified' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                                'bg-grey-100 dark:bg-brand-grey-700 text-brand-grey-700 dark:text-brand-grey-300'
+                          }`}>
                           {enquiry.status}
                         </span>
                       </div>
@@ -158,7 +191,7 @@ export default function EnquiriesPage() {
             {selectedEnquiry ? (
               <div className="bg-white dark:bg-brand-grey-900 rounded-lg border border-brand-grey-200 dark:border-brand-grey-800 p-6 sticky top-8">
                 <h3 className="font-semibold text-brand-black dark:text-white mb-4">Enquiry Details</h3>
-                
+
                 <div className="space-y-3 mb-6">
                   <div>
                     <p className="text-xs text-brand-grey-400 dark:text-brand-grey-500">Name</p>

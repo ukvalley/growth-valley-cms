@@ -1,24 +1,48 @@
-const { Enquiry } = require('../models');
+const { Enquiry, Settings } = require('../models');
 const csv = require('csv-stringify/sync');
+const { sendEnquiryNotification, sendEnquiryConfirmation } = require('../services/email');
+const config = require('../config');
 
 // @desc    Create new enquiry (public endpoint)
 // @route   POST /api/contact
 // @access  Public
 exports.createEnquiry = async (req, res) => {
   try {
-    const { name, email, phone, company, service, message, source } = req.body;
+    const { name, email, phone, company, service, message, source, interest } = req.body;
 
     const enquiry = await Enquiry.create({
       name,
       email,
       phone,
       company,
-      service: service || 'Other',
+      service: service || interest || 'Other',
       message,
       source: source || 'website',
     });
 
-    // TODO: Send notification email to admin
+    // Send notification email to admin and confirmation to user
+    try {
+      // Get admin email from settings or fall back to config
+      const settings = await Settings.getSingleton();
+      const adminEmail = settings?.contactInfo?.email || config.adminEmail;
+
+      // Send notification to admin (don't wait for it)
+      if (adminEmail) {
+        sendEnquiryNotification(enquiry, adminEmail).catch(err => {
+          console.error('Failed to send admin notification email:', err.message);
+        });
+      }
+
+      // Send confirmation to user (don't wait for it)
+      if (email) {
+        sendEnquiryConfirmation(enquiry).catch(err => {
+          console.error('Failed to send user confirmation email:', err.message);
+        });
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error('Email notification error:', emailError.message);
+    }
 
     res.status(201).json({
       success: true,

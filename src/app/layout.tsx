@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components';
 import { AuthProvider } from '@/lib/auth-context';
 import { SettingsProvider } from '@/lib/settings-context';
 import MainLayout from '@/components/MainLayout';
+import DynamicFavicon from '@/components/DynamicFavicon';
 
 export const metadata: Metadata = {
   title: {
@@ -52,6 +53,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <SettingsProvider>
+              <DynamicFavicon />
               <MainLayout>{children}</MainLayout>
             </SettingsProvider>
           </AuthProvider>

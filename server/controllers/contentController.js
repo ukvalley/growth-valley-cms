@@ -1,6 +1,157 @@
 const Content = require('../models/Content');
 
 /**
+ * Convert Map to plain object recursively
+ * Ensures proper serialization of MongoDB Map types
+ */
+function mapToObject(obj) {
+  if (!obj) return obj;
+  if (obj instanceof Map) {
+    const result = {};
+    for (const [key, value] of obj) {
+      result[key] = mapToObject(value);
+    }
+    return result;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => mapToObject(item));
+  }
+  if (typeof obj === 'object' && obj.constructor === Object) {
+    const result = {};
+    for (const key of Object.keys(obj)) {
+      result[key] = mapToObject(obj[key]);
+    }
+    return result;
+  }
+  return obj;
+}
+
+/**
+ * Helper function to sanitize sections data
+ * Ensures arrays that should contain primitives don't contain objects
+ * Recursively processes nested objects and arrays
+ */
+function sanitizeSections(sections) {
+  if (!sections || typeof sections !== 'object') return sections;
+
+  // Handle Map type (used by mongoose for sections)
+  if (sections instanceof Map) {
+    const result = new Map();
+    for (const [key, value] of sections) {
+      result.set(key, sanitizeValue(value));
+    }
+    return result;
+  }
+
+  // Handle plain object
+  const result = {};
+  for (const key of Object.keys(sections)) {
+    result[key] = sanitizeValue(sections[key]);
+  }
+  return result;
+}
+
+/**
+ * Sanitize a single value - converts objects in primitive arrays to strings
+ */
+// function sanitizeValue1(value) {
+//   if (Array.isArray(value)) {
+//     // Check if this looks like it should be a primitive array
+//     // by checking if all non-null items are primitives, or if empty, return as-is
+//     const nonNullItems = value.filter(item => item !== null && item !== undefined);
+
+//     if (nonNullItems.length === 0) {
+//       return value; // Empty or all-null array, return as-is
+//     }
+
+//     const allPrimitives = nonNullItems.every(item =>
+//       typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean'
+//     );
+
+//     if (allPrimitives) {
+//       // Already a primitive array, return as-is
+//       return value;
+//     }
+
+//     // Check if this looks like it SHOULD be a primitive array
+//     // by checking if some items are objects that can be stringified
+//     const someAreObjects = nonNullItems.some(item => typeof item === 'object');
+
+//     if (someAreObjects) {
+//       // Try to convert objects to strings if they look like they were accidentally stored
+//       // This handles cases where an object { } was stored instead of a string
+//       return value.map(item => {
+//         if (item === null || item === undefined) return '';
+//         if (typeof item === 'string') return item;
+//         if (typeof item === 'number' || typeof item === 'boolean') return String(item);
+//         if (typeof item === 'object') {
+//           // If object has a 'value' or 'text' property, use that
+//           if (item.value !== undefined) return String(item.value);
+//           if (item.text !== undefined) return String(item.text);
+//           // Otherwise, return empty string to avoid [object Object]
+//           return '';
+//         }
+//         return String(item);
+//       });
+//     }
+
+//     // It's an array of objects, sanitize each object recursively
+//     return value.map(item => {
+//       if (item && typeof item === 'object' && !Array.isArray(item)) {
+//         return sanitizeSections(item);
+//       }
+//       return item;
+//     });
+//   }
+
+//   if (value && typeof value === 'object') {
+//     return sanitizeSections(value);
+//   }
+
+//   return value;
+// }
+
+
+// function sanitizeValue2(value) {
+//   if (Array.isArray(value)) {
+//     return value.map(item => {
+//       if (item && typeof item === 'object' && !Array.isArray(item)) {
+//         return sanitizeSections(item);
+//       }
+//       return item;
+//     });
+//   }
+
+//   if (value && typeof value === 'object') {
+//     return sanitizeSections(value);
+//   }
+
+//   return value;
+// }
+
+function sanitizeValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(item => {
+      if (item && typeof item === 'object' && !Array.isArray(item)) {
+        return sanitizeSections(item);
+      }
+      return item;
+    });
+  }
+
+  // 🔥 AUTO CONVERT COMMA STRING TO ARRAY
+  if (typeof value === 'string' && value.includes(',')) {
+    return value.split(',').map(item => item.trim());
+  }
+
+  if (value && typeof value === 'object') {
+    return sanitizeSections(value);
+  }
+
+  return value;
+}
+
+/**
  * @desc    Get all pages with their content summary
  * @route   GET /api/content
  * @access  Public (for public pages) / Private (for admin)
@@ -8,7 +159,7 @@ const Content = require('../models/Content');
 const getAllPages = async (req, res) => {
   try {
     const pages = await Content.find({})
-      .select('page seo updatedAt')
+      // .select('page seo updatedAt')
       .sort({ page: 1 })
       .lean();
 
@@ -18,14 +169,15 @@ const getAllPages = async (req, res) => {
     const missingPages = Object.keys(defaultStructures).filter(p => !existingPages.includes(p));
 
     // Add missing pages with default values
+    // Filter out 'about' page - it's consolidated under 'company'
     const allPages = [
-      ...pages.map(p => ({
+      ...pages.filter(p => p.page !== 'about').map(p => ({
         page: p.page,
         seo: p.seo,
         updatedAt: p.updatedAt,
         exists: true
       })),
-      ...missingPages.map(p => ({
+      ...missingPages.filter(p => p !== 'about').map(p => ({
         page: p,
         seo: {},
         updatedAt: null,
@@ -53,8 +205,16 @@ const getAllPages = async (req, res) => {
  */
 const getPageContent = async (req, res) => {
   try {
-    const { page } = req.params;
-    const pageName = page.toLowerCase();
+    let { page } = req.params;
+    let pageName = page.toLowerCase();
+
+    // Page aliases for backward compatibility
+    if (pageName === 'about') {
+      pageName = 'company';
+    }
+    if (pageName === 'case-studies') {
+      pageName = 'casestudies';
+    }
 
     let content = await Content.findOne({ page: pageName }).lean();
 
@@ -67,6 +227,10 @@ const getPageContent = async (req, res) => {
         seo: {},
         isDefault: true
       };
+    } else {
+      // Convert Map to plain object for proper JSON serialization
+      // Use mapToObject for robust nested Map conversion
+      content.sections = mapToObject(content.sections);
     }
 
     res.json({
@@ -98,6 +262,10 @@ const getSectionContent = async (req, res) => {
       // Return default section if no content exists
       const defaultStructure = Content.getDefaultStructure(pageName);
       content = { sections: defaultStructure };
+    } else {
+      // Convert Map to plain object for proper JSON serialization
+      // Use mapToObject for robust nested Map conversion
+      content.sections = mapToObject(content.sections);
     }
 
     const sectionContent = content.sections?.[section];
@@ -133,9 +301,15 @@ const getSectionContent = async (req, res) => {
  */
 const updatePageContent = async (req, res) => {
   try {
-    const { page } = req.params;
+    let { page } = req.params;
+    let pageName = page.toLowerCase();
+
+    // Redirect 'about' to 'company' - they share the same content
+    if (pageName === 'about') {
+      pageName = 'company';
+    }
+
     const { sections, seo } = req.body;
-    const pageName = page.toLowerCase();
 
     // Validate that at least sections or seo is provided
     if (!sections && !seo) {
@@ -145,25 +319,41 @@ const updatePageContent = async (req, res) => {
       });
     }
 
-    const updateData = {
+    // Sanitize sections - ensure arrays of primitives are clean
+    const sanitizedSections = sections ? sanitizeSections(sections) : undefined;
+
+    // Build update with individual section paths to MERGE instead of REPLACE
+    // This prevents data loss if some sections are missing from the request
+    const updateSet = {
       page: pageName,
       updatedAt: new Date(),
       updatedBy: req.admin?._id
     };
 
-    if (sections) updateData.sections = sections;
-    if (seo) updateData.seo = seo;
+    // Use individual section paths to merge sections instead of replacing entire object
+    if (sanitizedSections) {
+      for (const [sectionKey, sectionValue] of Object.entries(sanitizedSections)) {
+        updateSet[`sections.${sectionKey}`] = sectionValue;
+      }
+    }
+    if (seo) updateSet.seo = seo;
 
-    const content = await Content.findOneAndUpdate(
+    let content = await Content.findOneAndUpdate(
       { page: pageName },
-      { $set: updateData },
-      { 
-        new: true, 
+      { $set: updateSet },
+      {
+        new: true,
         upsert: true,
         setDefaultsOnInsert: true,
         runValidators: true
       }
     ).lean();
+
+    // Convert Map to plain object for proper JSON serialization
+    // Use mapToObject for robust nested Map conversion
+    if (content) {
+      content.sections = mapToObject(content.sections);
+    }
 
     res.json({
       success: true,
@@ -172,7 +362,7 @@ const updatePageContent = async (req, res) => {
     });
   } catch (error) {
     console.error('Update page content error:', error);
-    
+
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(e => e.message);
       return res.status(400).json({
@@ -200,22 +390,31 @@ const updateSectionContent = async (req, res) => {
     const sectionData = req.body;
     const pageName = page.toLowerCase();
 
+    // Sanitize section data
+    const sanitizedData = sanitizeValue(sectionData);
+
     // Build update object
-    const content = await Content.findOneAndUpdate(
+    let content = await Content.findOneAndUpdate(
       { page: pageName },
       {
         $set: {
-          [`sections.${section}`]: sectionData,
+          [`sections.${section}`]: sanitizedData,
           updatedAt: new Date(),
           updatedBy: req.admin?._id
         }
       },
-      { 
-        new: true, 
+      {
+        new: true,
         upsert: true,
         setDefaultsOnInsert: true
       }
     ).lean();
+
+    // Convert Map to plain object for proper JSON serialization
+    // Use mapToObject for robust nested Map conversion
+    if (content) {
+      content.sections = mapToObject(content.sections);
+    }
 
     res.json({
       success: true,
@@ -290,7 +489,7 @@ const resetPageContent = async (req, res) => {
     const pageName = page.toLowerCase();
 
     const defaultStructure = Content.getDefaultStructure(pageName);
-    
+
     if (Object.keys(defaultStructure).length === 0) {
       return res.status(400).json({
         success: false,
@@ -298,7 +497,7 @@ const resetPageContent = async (req, res) => {
       });
     }
 
-    const content = await Content.findOneAndUpdate(
+    let content = await Content.findOneAndUpdate(
       { page: pageName },
       {
         $set: {
@@ -308,12 +507,18 @@ const resetPageContent = async (req, res) => {
           updatedBy: req.admin?._id
         }
       },
-      { 
-        new: true, 
+      {
+        new: true,
         upsert: true,
         setDefaultsOnInsert: true
       }
     ).lean();
+
+    // Convert Map to plain object for proper JSON serialization
+    // Use mapToObject for robust nested Map conversion
+    if (content) {
+      content.sections = mapToObject(content.sections);
+    }
 
     res.json({
       success: true,
@@ -349,8 +554,8 @@ const updateSEO = async (req, res) => {
           updatedBy: req.admin?._id
         }
       },
-      { 
-        new: true, 
+      {
+        new: true,
         upsert: true,
         setDefaultsOnInsert: true
       }
@@ -378,7 +583,7 @@ const updateSEO = async (req, res) => {
 const initializeDefaults = async (req, res) => {
   try {
     const results = await Content.initializeDefaults(req.admin._id);
-    
+
     res.json({
       success: true,
       message: `Initialized ${results.length} pages with default content`,
@@ -408,19 +613,41 @@ const getPageStructure = async (req, res) => {
 
     const defaultStructure = Content.getDefaultStructure(pageName);
 
-    // Build section schema info
+    // Build section schema info with enhanced array detection
     const sections = Object.keys(defaultStructure).map(sectionKey => {
       const sectionData = defaultStructure[sectionKey];
       const type = Array.isArray(sectionData) ? 'array' : typeof sectionData;
-      const fields = type === 'array' 
+      const fields = type === 'array'
         ? (sectionData[0] ? Object.keys(sectionData[0]) : [])
         : (sectionData && typeof sectionData === 'object' ? Object.keys(sectionData) : []);
-      
+
+      // Check if this is a primitive array (array of strings/numbers)
+      const isPrimitiveArray = type === 'array' && (
+        sectionData.length === 0 ||
+        sectionData.every(item => typeof item === 'string' || typeof item === 'number')
+      );
+
+      // For objects, check each field for primitive arrays
+      let fieldArrayTypes = {};
+      if (type !== 'array' && sectionData && typeof sectionData === 'object') {
+        for (const field of Object.keys(sectionData)) {
+          const fieldValue = sectionData[field];
+          if (Array.isArray(fieldValue)) {
+            fieldArrayTypes[field] = {
+              isPrimitive: fieldValue.length === 0 ||
+                fieldValue.every(item => typeof item === 'string' || typeof item === 'number')
+            };
+          }
+        }
+      }
+
       return {
         name: sectionKey,
         type,
         fields,
-        isArray: type === 'array'
+        isArray: type === 'array',
+        isPrimitiveArray,
+        fieldArrayTypes
       };
     });
 
@@ -440,6 +667,23 @@ const getPageStructure = async (req, res) => {
   }
 };
 
+const deleteContentByPage = async (req, res) => {
+  try {
+    const { page } = req.params;
+
+    await Content.deleteOne({ page });
+
+    res.json({
+      success: true,
+      message: `${page} deleted successfully`
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 module.exports = {
   getAllPages,
   getPageContent,
@@ -450,5 +694,6 @@ module.exports = {
   resetPageContent,
   updateSEO,
   initializeDefaults,
-  getPageStructure
+  getPageStructure,
+  deleteContentByPage
 };

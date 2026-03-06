@@ -4,6 +4,25 @@ import Container from "@/components/Container";
 import Button from "@/components/Button";
 import { motion } from "framer-motion";
 
+/**
+ * Safely converts a value to an array.
+ * Handles: undefined, null, string (JSON), object, or actual arrays.
+ */
+function ensureArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 interface Industry {
   id: string;
   name: string;
@@ -106,7 +125,7 @@ export default function IndustriesClient({ hero, industries, cta }: IndustriesCl
                       Common Challenges
                     </h4>
                     <ul className="space-y-3">
-                      {industry.challenges.map((challenge, idx) => (
+                      {ensureArray(industry.challenges).map((challenge, idx) => (
                         <motion.li
                           key={idx}
                           className="flex items-start gap-3 text-body-sm text-brand-grey-600 dark:text-brand-grey-300"
@@ -138,7 +157,7 @@ export default function IndustriesClient({ hero, industries, cta }: IndustriesCl
                       Typical Results
                     </h4>
                     <ul className="space-y-3 relative z-10">
-                      {industry.results.map((result, idx) => (
+                      {ensureArray(industry.results).map((result, idx) => (
                         <motion.li
                           key={idx}
                           className="flex items-start gap-3 text-body-sm"
@@ -147,7 +166,7 @@ export default function IndustriesClient({ hero, industries, cta }: IndustriesCl
                           viewport={{ once: true }}
                           transition={{ delay: idx * 0.05 + 0.4 }}
                         >
-                          <motion.span 
+                          <motion.span
                             className="text-accent mt-1"
                             whileHover={{ scale: 1.2 }}
                           >

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { teamAPI } from '@/lib/admin-api';
 import { useAuth } from '@/lib/auth-context';
 import AdminLayout from '../AdminLayout';
+import { getImageUrl } from '@/lib/utils';
 
 
 interface TeamMember {
@@ -17,19 +18,6 @@ interface TeamMember {
   linkedin?: string;
   twitter?: string;
 }
-
-const getImageUrl = (path?: string) => {
-  if (!path) return ''; // fallback if no image
-  if (path.startsWith('http')) return path; // already full URL
-
-  // If running on localhost, use localhost backend
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ||
-    (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-      ? 'http://localhost:3001'
-      : 'https://your-live-domain.com');
-
-  return `${baseUrl}${path}`;
-};
 
 export default function TeamListPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -88,14 +76,31 @@ export default function TeamListPage() {
             ← Back to Dashboard
           </Link>
         </div>
-        <div className="flex items-center justify-between mb-8">
+        {/* <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-brand-black dark:text-white">Team Members</h1>
             <p className="text-brand-grey-500 dark:text-brand-grey-400 mt-1">{members.length} team members</p>
           </div>
           <Link
             href="/admin/team/new"
-            className="px-6 py-3 bg-accent text-brand-black font-semibold rounded-lg hover:bg-accent-light transition-colors"
+            className="px-6 py-3 ml-1 bg-accent text-brand-black font-semibold rounded-lg hover:bg-accent-light transition-colors"
+          >
+            + Add Member
+          </Link>
+        </div> */}
+
+        <div className="flex items-center justify-between mb-8">
+          <div className="mb-3 sm:mb-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand-black dark:text-white">
+              Team Members
+            </h1>
+            <p className="text-sm sm:text-base text-brand-grey-500 dark:text-brand-grey-400 mt-1">
+              {members.length} team members
+            </p>
+          </div>
+          <Link
+            href="/admin/team/new"
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-accent text-brand-black font-semibold rounded-lg hover:bg-accent-light transition-colors text-sm sm:text-base"
           >
             + Add Member
           </Link>

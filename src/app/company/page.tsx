@@ -1,9 +1,10 @@
-import PageHeader from "@/components/PageHeader";
+import { getPublicPageContent } from '@/lib/utils';
+
+export const dynamic = 'force-dynamic'; import PageHeader from "@/components/PageHeader";
 import { getPageContent, getSection, getPageSEO } from "@/lib/content";
 import { Metadata } from "next";
 import CompanyClient from "./CompanyClient";
 
-export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getPageContent('company');
@@ -17,8 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function getTeamMembers() {
   try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "http://localhost:3001";
     const res = await fetch(
-      `${process.env.API_URL || "http://localhost:3001"}/api/team`,
+      `${apiUrl}/api/team`,
       { cache: "no-store" }
     );
     if (!res.ok) return [];
@@ -51,6 +53,7 @@ export default async function CompanyPage() {
   }>(content, 'approach');
   const cta = getSection<{ title: string; description: string; buttonText: string; buttonLink: string }>(content, 'cta');
 
+  console.log("approach  :", approach)
   return (
     <>
       <PageHeader
@@ -58,7 +61,7 @@ export default async function CompanyPage() {
         description={hero?.description || "We help B2B companies transform fragmented revenue operations into unified, predictable growth engines."}
         breadcrumb={[{ label: "Company", href: "/company" }]}
       />
-      <CompanyClient 
+      <CompanyClient
         mission={mission}
         origin={origin}
         teamMembers={teamMembers}

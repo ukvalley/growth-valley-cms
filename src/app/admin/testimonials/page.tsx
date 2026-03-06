@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { testimonialAPI } from '@/lib/admin-api';
 import { useAuth } from '@/lib/auth-context';
 import AdminLayout from '../AdminLayout';
+import { getImageUrl } from '@/lib/utils';
 
 interface Testimonial {
   _id: string;
@@ -61,18 +62,6 @@ export default function TestimonialsListPage() {
     }
   };
 
-  const getImageUrl = (path?: string) => {
-    if (!path) return ''; // fallback if no image
-    if (path.startsWith('http')) return path; // already full URL
-
-    // If running on localhost, use localhost backend
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL ||
-      (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-        ? 'http://localhost:3001'
-        : 'https://your-live-domain.com');
-
-    return `${baseUrl}${path}`;
-  };
   const toggleStatus = async (id: string, status: string) => {
     try {
       await testimonialAPI.update(id, { status: status === 'active' ? 'inactive' : 'active' });
@@ -99,7 +88,7 @@ export default function TestimonialsListPage() {
             ← Back to Dashboard
           </Link>
         </div>
-        <div className="flex items-center justify-between mb-8">
+        {/* <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-brand-black dark:text-white">Testimonials</h1>
             <p className="text-brand-grey-500 dark:text-brand-grey-400 mt-1">{testimonials.length} total</p>
@@ -107,6 +96,22 @@ export default function TestimonialsListPage() {
           <Link
             href="/admin/testimonials/new"
             className="px-6 py-3 bg-accent text-brand-black font-semibold rounded-lg hover:bg-accent-light transition-colors"
+          >
+            + New Testimonial
+          </Link>
+        </div> */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8">
+          <div className="mb-3 sm:mb-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand-black dark:text-white">
+              Testimonials
+            </h1>
+            <p className="text-sm sm:text-base text-brand-grey-500 dark:text-brand-grey-400 mt-1">
+              {testimonials.length} total
+            </p>
+          </div>
+          <Link
+            href="/admin/testimonials/new"
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-accent text-brand-black font-semibold rounded-lg hover:bg-accent-light transition-colors text-sm sm:text-base"
           >
             + New Testimonial
           </Link>

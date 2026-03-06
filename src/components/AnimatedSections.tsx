@@ -15,6 +15,7 @@ import {
   HoverLift,
   staggerItem
 } from '@/components/animations';
+import { getImageUrl } from '@/lib/utils';
 
 // Animation variants
 const containerVariants = {
@@ -64,17 +65,17 @@ function FloatingShapes() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {/* Gradient Orbs */}
-      <motion.div 
+      <motion.div
         className="absolute -top-40 -right-40 w-96 h-96 bg-accent/10 rounded-full blur-3xl"
         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute top-1/2 -left-20 w-72 h-72 bg-accent/5 rounded-full blur-3xl"
         animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       {/* Geometric Shapes */}
       <motion.div
         className="absolute top-32 right-1/4 w-4 h-4 bg-accent/30 rotate-45"
@@ -97,29 +98,42 @@ function FloatingShapes() {
 
 // Hero Section with animations
 export function AnimatedHeroSection({ hero }: { hero: any }) {
+  console.log("Home Content : ", hero)
+
   return (
     <section className="relative pt-32 pb-16 md:pt-40 md:pb-24 lg:pt-48 lg:pb-32 bg-white dark:bg-brand-grey-950 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-hero-gradient bg-dot-pattern" />
       <FloatingShapes />
-      
+
       <Container className="relative z-10">
-        <motion.div 
+        <motion.div
           className="max-w-4xl"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
           {hero?.label && (
-            <motion.span 
+            <motion.span
               className="text-label text-accent uppercase mb-6 block"
               variants={itemVariants}
             >
               {hero.label}
             </motion.span>
           )}
-          <motion.h1 
-            className="text-display text-brand-black dark:text-white mb-6"
+          <motion.h1
+            // className="text-display text-brand-black dark:text-white mb-6"
+            // variants={itemVariants}
+            className="
+    text-3xl 
+    sm:text-4xl 
+    md:text-5xl 
+    lg:text-6xl 
+    text-brand-black 
+    dark:text-white 
+    mb-6 
+    leading-tight
+  "
             variants={itemVariants}
           >
             {hero?.title ? (
@@ -131,13 +145,26 @@ export function AnimatedHeroSection({ hero }: { hero: any }) {
               'Predictable Revenue Systems for Scalable Businesses'
             )}
           </motion.h1>
-          <motion.p 
-            className="text-heading-3 text-brand-grey-500 dark:text-brand-grey-400 font-normal mb-10 max-w-3xl"
+          <motion.p
+            // className="text-xl text-left text-brand-grey-500 dark:text-brand-grey-400 font-normal mb-10 max-w-3xl"
+            // variants={itemVariants}
+            className="
+    text-base 
+    sm:text-lg 
+    md:text-xl 
+    text-left 
+    text-brand-grey-500 
+    dark:text-brand-grey-400 
+    font-normal 
+    mb-10 
+    max-w-3xl
+  "
             variants={itemVariants}
+
           >
             {hero?.subtitle || 'We transform fragmented revenue operations into unified, predictable growth engines.'}
           </motion.p>
-          <motion.div 
+          <motion.div
             className="flex flex-wrap gap-4"
             variants={itemVariants}
           >
@@ -162,14 +189,14 @@ export function AnimatedCredibilitySection({ stats }: { stats: any[] }) {
     <section className="relative py-16 bg-brand-grey-50 dark:bg-brand-grey-900 overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-mesh" />
-      <motion.div 
+      <motion.div
         className="absolute top-0 left-1/4 w-64 h-64 bg-accent/5 rounded-full blur-3xl"
         animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       <Container className="relative z-10">
-        <motion.div 
+        <motion.div
           className="grid grid-cols-2 md:grid-cols-4 gap-8"
           initial="hidden"
           whileInView="visible"
@@ -177,8 +204,8 @@ export function AnimatedCredibilitySection({ stats }: { stats: any[] }) {
           variants={containerVariants}
         >
           {(stats || []).map((stat, index) => (
-            <motion.div 
-              key={index} 
+            <motion.div
+              key={index}
               variants={itemVariants}
               whileHover={{ scale: 1.05, y: -5 }}
               className="text-center"
@@ -198,12 +225,12 @@ export function AnimatedProblemSection({ problems }: { problems: any }) {
     <section className="relative py-20 bg-white dark:bg-brand-grey-950 overflow-hidden">
       {/* Diagonal Pattern */}
       <div className="absolute inset-0 bg-diagonal-pattern opacity-50" />
-      <motion.div 
+      <motion.div
         className="absolute -bottom-20 -right-20 w-72 h-72 bg-accent/5 rounded-full blur-3xl"
         animate={{ scale: [1, 1.3, 1] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       <Container className="relative z-10">
         <FadeInUp>
           <SectionHeader
@@ -212,7 +239,7 @@ export function AnimatedProblemSection({ problems }: { problems: any }) {
             description={problems?.description || 'Sound familiar? You\'re not alone.'}
           />
         </FadeInUp>
-        <motion.div 
+        <motion.div
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           initial="hidden"
           whileInView="visible"
@@ -220,14 +247,14 @@ export function AnimatedProblemSection({ problems }: { problems: any }) {
           variants={containerVariants}
         >
           {(problems?.items || []).map((problem: any, index: number) => (
-            <motion.div 
-              key={index} 
+            <motion.div
+              key={index}
               className="relative border-l-2 border-accent pl-6 py-4 bg-gradient-to-r from-accent/5 to-transparent"
               variants={itemVariants}
               whileHover={{ x: 4, backgroundColor: 'rgba(255, 193, 7, 0.05)' }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
-              <motion.div 
+              <motion.div
                 className="absolute -left-1.5 top-4 w-3 h-3 bg-accent"
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
@@ -237,7 +264,7 @@ export function AnimatedProblemSection({ problems }: { problems: any }) {
               <h3 className="text-heading-4 text-brand-black dark:text-white mb-2">
                 {problem.title}
               </h3>
-              <p className="text-body text-brand-grey-500 dark:text-brand-grey-400">
+              <p className="text-body text-left text-brand-grey-500 dark:text-brand-grey-400">
                 {problem.description}
               </p>
             </motion.div>
@@ -250,6 +277,7 @@ export function AnimatedProblemSection({ problems }: { problems: any }) {
 
 // Solution Section with animations
 export function AnimatedSolutionSection({ solutions }: { solutions: any }) {
+  console.log("Solutions : ", solutions)
   const iconMap: Record<string, JSX.Element> = {
     chart: <Icons.Chart />,
     process: <Icons.Process />,
@@ -261,33 +289,35 @@ export function AnimatedSolutionSection({ solutions }: { solutions: any }) {
     <section className="relative py-20 bg-brand-grey-50 dark:bg-brand-grey-900 overflow-hidden">
       {/* Grid Pattern */}
       <div className="absolute inset-0 bg-grid-pattern" />
-      <motion.div 
+      <motion.div
         className="absolute top-1/4 -left-10 w-48 h-48 bg-accent/10 rounded-full blur-3xl"
         animate={{ y: [0, 30, 0], x: [0, 20, 0] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute bottom-1/4 -right-10 w-64 h-64 bg-accent/5 rounded-full blur-3xl"
         animate={{ y: [0, -20, 0] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       <Container className="relative z-10">
-        <FadeInUp>
+        <FadeInUp  >
           <SectionHeader
             label={solutions?.title || 'Our Approach'}
             title={solutions?.subtitle || 'Building predictable revenue, systematically'}
             description={solutions?.description || 'We don\'t offer quick fixes. We build lasting revenue systems.'}
+
           />
         </FadeInUp>
-        <motion.div 
+
+        <motion.div
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
           variants={containerVariants}
         >
-          {(solutions?.items || []).map((solution: any, index: number) => (
+          {/* {(solutions?.items || []).map((solution: any, index: number) => (
             <motion.div
               key={index}
               variants={itemVariants}
@@ -299,12 +329,44 @@ export function AnimatedSolutionSection({ solutions }: { solutions: any }) {
                 title={solution.title}
                 description={solution.description}
                 icon={iconMap[solution.icon] || <Icons.Chart />}
-                href="/solutions"
+                // href={`/solutions#${solution.id || solution.title?.toLowerCase().replace(/\s+/g, '-')}`}
+                href={`/solutions#${solution.id}`}
+
               />
             </motion.div>
-          ))}
+          ))} */}
+
+
+          {(solutions?.items || []).map((solution: any, index: number) => {
+
+            const solutionIds = [
+              "revenue-architecture",
+              "sales-process",
+              "revops",
+              "gtm"
+            ];
+
+            const solutionId = solution.id || solutionIds[index];
+
+            return (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+                className="h-full"
+              >
+                <Card
+                  title={solution.title}
+                  description={solution.description}
+                  icon={iconMap[solution.icon] || <Icons.Chart />}
+                  href={`/solutions#${solutionId}`}
+                />
+              </motion.div>
+            );
+          })}
         </motion.div>
-        <motion.div 
+        <motion.div
           className="text-center mt-12"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -312,7 +374,8 @@ export function AnimatedSolutionSection({ solutions }: { solutions: any }) {
           transition={{ delay: 0.5 }}
         >
           <Button href="/solutions" variant="secondary">
-            Explore All Solutions
+            {solutions?.exploreButtonText || "Explore All Solutions"}
+
           </Button>
         </motion.div>
       </Container>
@@ -326,21 +389,23 @@ export function AnimatedIndustriesSection({ industries }: { industries: any }) {
     <section className="relative py-20 bg-white dark:bg-brand-grey-950 overflow-hidden">
       {/* Dot Pattern */}
       <div className="absolute inset-0 bg-dot-pattern" />
-      <motion.div 
+      <motion.div
         className="absolute top-20 right-1/4 w-40 h-40 bg-accent/10 rounded-full blur-2xl"
         animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       <Container className="relative z-10">
+
         <FadeInUp>
           <SectionHeader
             label={industries?.title || 'Industries'}
             title={industries?.subtitle || 'Deep expertise across B2B sectors'}
             description={industries?.description || 'We\'ve helped companies across industries transform.'}
           />
+
         </FadeInUp>
-        <motion.div 
+        <motion.div
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
           initial="hidden"
           whileInView="visible"
@@ -356,10 +421,10 @@ export function AnimatedIndustriesSection({ industries }: { industries: any }) {
               className="h-full"
             >
               <Link
-                href="/industries"
+                href={`/industries#${industry.id || industry.name?.toLowerCase().replace(/\s+/g, '-')}`}
                 className="block h-full bg-white dark:bg-brand-grey-900 border border-brand-grey-200 dark:border-brand-grey-800 p-6 hover:border-accent hover:shadow-lg transition-all duration-300"
               >
-                <motion.span 
+                <motion.span
                   className="text-3xl mb-4 block"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: 'spring', stiffness: 300 }}
@@ -369,7 +434,7 @@ export function AnimatedIndustriesSection({ industries }: { industries: any }) {
                 <h3 className="text-heading-4 text-brand-black dark:text-white mb-2">
                   {industry.name}
                 </h3>
-                <p className="text-body-sm text-brand-grey-500 dark:text-brand-grey-400">
+                <p className="text-body-sm text-left text-brand-grey-500 dark:text-brand-grey-400">
                   {industry.description}
                 </p>
               </Link>
@@ -384,22 +449,22 @@ export function AnimatedIndustriesSection({ industries }: { industries: any }) {
 // Testimonials Section with animations
 export function AnimatedTestimonialsSection({ testimonials }: { testimonials: any[] }) {
   if (!testimonials || testimonials.length === 0) return null;
-  
+
   return (
     <section className="relative py-20 bg-brand-grey-50 dark:bg-brand-grey-900 overflow-hidden">
       {/* Gradient Mesh */}
       <div className="absolute inset-0 bg-gradient-mesh" />
-      <motion.div 
+      <motion.div
         className="absolute top-1/3 left-0 w-56 h-56 bg-accent/8 rounded-full blur-3xl"
         animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute bottom-1/4 right-0 w-72 h-72 bg-accent/5 rounded-full blur-3xl"
         animate={{ x: [0, -20, 0] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       <Container className="relative z-10">
         <FadeInUp>
           <SectionHeader
@@ -408,7 +473,7 @@ export function AnimatedTestimonialsSection({ testimonials }: { testimonials: an
             description="Hear from the companies we've helped transform"
           />
         </FadeInUp>
-        <motion.div 
+        <motion.div
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
           initial="hidden"
           whileInView="visible"
@@ -429,7 +494,7 @@ export function AnimatedTestimonialsSection({ testimonials }: { testimonials: an
                   <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
                 </svg>
               </div>
-              
+
               {/* Rating Stars */}
               {testimonial.rating && (
                 <div className="flex gap-1 mb-4">
@@ -449,17 +514,17 @@ export function AnimatedTestimonialsSection({ testimonials }: { testimonials: an
                   ))}
                 </div>
               )}
-              
+
               {/* Quote */}
               <blockquote className="text-body text-brand-grey-600 dark:text-brand-grey-300 mb-6 italic relative z-10">
                 "{testimonial.quote}"
               </blockquote>
-              
+
               {/* Author */}
               <div className="flex items-center gap-4">
                 {testimonial.avatar ? (
                   <img
-                    src={testimonial.avatar}
+                    src={getImageUrl(testimonial.avatar)}
                     alt={testimonial.author}
                     className="w-12 h-12 rounded-full object-cover"
                   />
@@ -492,7 +557,7 @@ export function AnimatedTestimonialsSection({ testimonials }: { testimonials: an
 // Client Logos Section with animations
 export function AnimatedClientLogosSection({ clients }: { clients: any[] }) {
   if (!clients || clients.length === 0) return null;
-  
+
   return (
     <Section>
       <Container>
@@ -506,7 +571,7 @@ export function AnimatedClientLogosSection({ clients }: { clients: any[] }) {
             </h2>
           </div>
         </FadeInUp>
-        <motion.div 
+        <motion.div
           className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center"
           initial="hidden"
           whileInView="visible"
@@ -571,12 +636,12 @@ export function AnimatedCaseStudyPreview({ caseStudyPreview }: { caseStudyPrevie
     <section className="relative py-20 bg-white dark:bg-brand-grey-950 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-diagonal-pattern" />
-      <motion.div 
+      <motion.div
         className="absolute top-0 right-0 w-80 h-80 bg-accent/5 rounded-full blur-3xl"
         animate={{ scale: [1, 1.2, 1] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       <Container className="relative z-10">
         <FadeInUp>
           <SectionHeader
@@ -584,7 +649,7 @@ export function AnimatedCaseStudyPreview({ caseStudyPreview }: { caseStudyPrevie
             title={caseStudyPreview?.subtitle || 'Real transformations. Real numbers.'}
           />
         </FadeInUp>
-        <motion.div 
+        <motion.div
           className="grid md:grid-cols-2 gap-8"
           initial="hidden"
           whileInView="visible"
@@ -592,39 +657,89 @@ export function AnimatedCaseStudyPreview({ caseStudyPreview }: { caseStudyPrevie
           variants={containerVariants}
         >
           {(caseStudyPreview?.items || []).map((cs: any, index: number) => (
+            // <motion.div
+            //   key={index}
+            //   variants={itemVariants}
+            //   whileHover={{ y: -8, scale: 1.01 }}
+            //   transition={{ type: 'spring', stiffness: 300 }}
+            // >
+            //   <Link
+            //     href={cs.link || '/case-studies'}
+            //     className="block bg-white dark:bg-brand-grey-900 border border-brand-grey-200 dark:border-brand-grey-800 p-8 hover:border-accent hover:shadow-xl transition-all duration-300"
+            //   >
+            //     <div className="flex justify-between items-start mb-4">
+            //       <span className="text-label text-brand-grey-400 dark:text-brand-grey-500 uppercase">
+            //         {cs.industry}
+            //       </span>
+            //       <motion.span
+            //         // className="text-heading-4 text-accent font-bold"
+            //         className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-accent font-bold"
+
+            //         initial={{ opacity: 0, scale: 0.5 }}
+            //         whileInView={{ opacity: 1, scale: 1 }}
+            //         viewport={{ once: true }}
+            //         transition={{ delay: index * 0.2 + 0.3, type: 'spring' }}
+            //       >
+            //         {cs.result}
+            //       </motion.span>
+            //     </div>
+            //     <h3 className="text-heading-3 text-brand-black dark:text-white mb-2">
+            //       {cs.client}
+            //     </h3>
+            //     <p className="text-body text-brand-grey-500 dark:text-brand-grey-400">{cs.description}</p>
+            //   </Link>
+            // </motion.div>
             <motion.div
               key={index}
               variants={itemVariants}
-              whileHover={{ y: -8, scale: 1.01 }}
+              whileHover={{ y: -4, scale: 1.01 }} // subtle hover for all devices
               transition={{ type: 'spring', stiffness: 300 }}
             >
               <Link
                 href={cs.link || '/case-studies'}
-                className="block bg-white dark:bg-brand-grey-900 border border-brand-grey-200 dark:border-brand-grey-800 p-8 hover:border-accent hover:shadow-xl transition-all duration-300"
+                className="
+      block 
+      bg-white dark:bg-brand-grey-900 
+      border border-brand-grey-200 dark:border-brand-grey-800 
+      p-4 sm:p-6 md:p-8 
+      hover:border-accent hover:shadow-xl 
+      transition-all duration-300
+      rounded-lg
+    "
               >
-                <div className="flex justify-between items-start mb-4">
-                  <span className="text-label text-brand-grey-400 dark:text-brand-grey-500 uppercase">
+                <div className="flex justify-between items-start mb-3 sm:mb-4">
+                  {/* Industry Label */}
+                  <span className="text-xs sm:text-sm md:text-base text-brand-grey-400 dark:text-brand-grey-500 uppercase">
                     {cs.industry}
                   </span>
-                  <motion.span 
-                    className="text-heading-4 text-accent font-bold"
+
+                  {/* Result Number */}
+                  <motion.span
+                    className="text-base sm:text-xs md:text-xl lg:text-2xl xl:text-3xl text-accent font-bold"
                     initial={{ opacity: 0, scale: 0.5 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.2 + 0.3, type: 'spring' }}
+                    transition={{ delay: index * 0.15 + 0.2, type: 'spring' }}
                   >
                     {cs.result}
                   </motion.span>
                 </div>
-                <h3 className="text-heading-3 text-brand-black dark:text-white mb-2">
+
+                {/* Client Name */}
+                <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-brand-black dark:text-white mb-1 sm:mb-2">
                   {cs.client}
                 </h3>
-                <p className="text-body text-brand-grey-500 dark:text-brand-grey-400">{cs.description}</p>
+
+                {/* Description */}
+                <p className="text-sm sm:text-base md:text-lg text-brand-grey-500 dark:text-brand-grey-400">
+                  {cs.description}
+                </p>
               </Link>
             </motion.div>
+
           ))}
         </motion.div>
-        <motion.div 
+        <motion.div
           className="text-center mt-12"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -646,10 +761,10 @@ export function AnimatedOperatingModel({ process }: { process: any }) {
     <section className="relative py-20 bg-brand-grey-50 dark:bg-brand-grey-900 overflow-hidden">
       {/* Grid Pattern */}
       <div className="absolute inset-0 bg-grid-pattern" />
-      
+
       {/* Decorative Line */}
       <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
-      
+
       <Container className="relative z-10">
         <FadeInUp>
           <SectionHeader
@@ -657,7 +772,7 @@ export function AnimatedOperatingModel({ process }: { process: any }) {
             title={process?.subtitle || 'A systematic approach to transformation'}
           />
         </FadeInUp>
-        <motion.div 
+        <motion.div
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           initial="hidden"
           whileInView="visible"
@@ -665,13 +780,13 @@ export function AnimatedOperatingModel({ process }: { process: any }) {
           variants={containerVariants}
         >
           {(process?.steps || []).map((step: any, index: number) => (
-            <motion.div 
-              key={index} 
+            <motion.div
+              key={index}
               className="relative"
               variants={itemVariants}
             >
               {/* Step Number Circle */}
-              <motion.div 
+              <motion.div
                 className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-6"
                 whileHover={{ scale: 1.1, backgroundColor: 'rgba(255, 193, 7, 0.2)' }}
                 transition={{ type: 'spring', stiffness: 300 }}
@@ -680,20 +795,20 @@ export function AnimatedOperatingModel({ process }: { process: any }) {
                   {step.number || `0${index + 1}`}
                 </span>
               </motion.div>
-              
+
               {/* Content */}
               <div className="pl-2">
                 <h3 className="text-heading-4 text-brand-black dark:text-white mb-2">
                   {step.title}
                 </h3>
-                <p className="text-body text-brand-grey-500 dark:text-brand-grey-400">
+                <p className="text-body text-left text-brand-grey-500 dark:text-brand-grey-400">
                   {step.description}
                 </p>
               </div>
-              
+
               {/* Connector Line (except last) */}
               {index < (process?.steps?.length || 4) - 1 && (
-                <motion.div 
+                <motion.div
                   className="hidden lg:block absolute top-8 left-20 w-full h-0.5 bg-gradient-to-r from-accent/30 to-transparent"
                   initial={{ scaleX: 0, originX: 0 }}
                   whileInView={{ scaleX: 1 }}
@@ -715,45 +830,45 @@ export function AnimatedFinalCTA({ cta }: { cta: any }) {
     <section className="relative py-24 bg-brand-grey-50 dark:bg-brand-grey-900 overflow-hidden">
       {/* Animated Gradient */}
       <div className="absolute inset-0 bg-animated-gradient" />
-      
+
       {/* Floating Elements */}
-      <motion.div 
+      <motion.div
         className="absolute top-10 left-1/4 w-4 h-4 bg-accent/30 rounded-full"
         animate={{ y: [0, -30, 0], opacity: [0.3, 0.6, 0.3] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute top-1/3 right-1/4 w-3 h-3 bg-accent/20 rotate-45"
         animate={{ rotate: [45, 90, 45], y: [0, -20, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute bottom-20 left-1/3 w-2 h-2 bg-accent/25 rounded-full"
         animate={{ scale: [1, 1.5, 1] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       {/* Gradient Orbs */}
-      <motion.div 
+      <motion.div
         className="absolute top-1/2 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2"
         animate={{ x: [0, 30, 0], scale: [1, 1.1, 1] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute top-1/2 right-0 w-80 h-80 bg-accent/8 rounded-full blur-3xl -translate-y-1/2"
         animate={{ x: [0, -30, 0], scale: [1.1, 1, 1.1] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       <Container className="relative z-10">
-        <motion.div 
+        <motion.div
           className="max-w-3xl mx-auto text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <motion.h2 
+          <motion.h2
             className="text-heading-1 text-brand-black dark:text-white mb-6"
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -762,7 +877,7 @@ export function AnimatedFinalCTA({ cta }: { cta: any }) {
           >
             {cta?.title || 'Ready for predictable revenue?'}
           </motion.h2>
-          <motion.p 
+          <motion.p
             className="text-body-lg text-brand-grey-500 dark:text-brand-grey-400 mb-10"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}

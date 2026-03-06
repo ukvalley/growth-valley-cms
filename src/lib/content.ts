@@ -36,6 +36,7 @@ const defaultContent = {
       title: 'Our Approach',
       subtitle: 'Building predictable revenue, systematically',
       description: 'We don\'t offer quick fixes. We build lasting revenue systems.',
+      exploreButtonText: 'Explore All Solutions',
       items: [
         { icon: 'chart', title: 'Revenue Architecture', description: 'Design unified revenue systems with clear stages, metrics, and accountability.' },
         { icon: 'process', title: 'Sales Process Design', description: 'Build scalable processes that convert leads consistently and efficiently.' },
@@ -79,7 +80,7 @@ const defaultContent = {
       buttonLink: '/contact'
     }
   },
-  
+
   company: {
     hero: {
       title: 'About Growth Valley',
@@ -120,7 +121,7 @@ const defaultContent = {
       buttonLink: '/contact'
     }
   },
-  
+
   services: {
     hero: {
       title: 'Revenue Solutions That Scale',
@@ -163,7 +164,7 @@ const defaultContent = {
       buttonLink: '/contact'
     }
   },
-  
+
   industries: {
     hero: {
       title: 'Industry Expertise',
@@ -214,33 +215,21 @@ const defaultContent = {
       buttonLink: '/contact'
     }
   },
-  
-  'case-studies': {
-    hero: {
+
+  'casestudies': {
+    header: {
+      breadcrumbTitle: 'Case Studies',
       title: 'Case Studies',
-      description: 'Real transformations. Real results. Explore how we\'ve helped B2B companies achieve predictable revenue growth.'
-    },
-    featured: {
-      title: 'Featured Results',
-      stats: [
-        { value: '40%', label: 'Average Revenue Growth' },
-        { value: '85%', label: 'Forecast Accuracy' },
-        { value: '50+', label: 'Companies Transformed' },
-        { value: '$2B+', label: 'Revenue Influenced' }
-      ]
-    },
-    filter: {
-      industries: ['All', 'SaaS', 'Manufacturing', 'Professional Services', 'Financial Services'],
-      solutions: ['All', 'Revenue Architecture', 'Sales Process', 'RevOps', 'Go-to-Market']
+      description: 'Real transformations. Real numbers. See how we\'ve helped B2B companies achieve predictable revenue growth.'
     },
     cta: {
-      title: 'Ready to write your success story?',
-      description: 'Let\'s discuss how we can help you achieve similar results.',
-      buttonText: 'Schedule a Consultation',
+      title: 'Want results like these?',
+      description: 'Every transformation starts with a conversation. Let\'s discuss your revenue challenges.',
+      buttonText: 'Schedule a Call',
       buttonLink: '/contact'
     }
   },
-  
+
   contact: {
     hero: {
       title: 'Get in Touch',
@@ -274,7 +263,7 @@ const defaultContent = {
       description: 'Thank you for reaching out. We\'ll get back to you within one business day.'
     }
   },
-  
+
   privacy: {
     hero: {
       title: 'Privacy Policy',
@@ -336,7 +325,7 @@ const defaultContent = {
       buttonLink: '/contact'
     }
   },
-  
+
   terms: {
     hero: {
       title: 'Terms & Conditions',
@@ -422,32 +411,74 @@ export type PageContent = {
 };
 
 /**
+ * Deep merge utility - merges source into target recursively
+ * Preserves all existing data while overlaying new data
+ */
+function deepMergeSections<T extends Record<string, any>>(target: T, source: Partial<T> | undefined): T {
+  if (!source) return target;
+
+  const result = { ...target };
+
+  for (const key of Object.keys(source) as (keyof T)[]) {
+    const sourceValue = source[key];
+    const targetValue = target[key];
+
+    // If both are non-null objects (not arrays), merge recursively
+    if (
+      sourceValue !== null &&
+      typeof sourceValue === 'object' &&
+      !Array.isArray(sourceValue) &&
+      targetValue !== null &&
+      typeof targetValue === 'object' &&
+      !Array.isArray(targetValue)
+    ) {
+      result[key] = deepMergeSections(targetValue as Record<string, any>, sourceValue as Record<string, any>) as T[keyof T];
+    } else {
+      // For arrays, primitives, or null values, use source value (it takes priority)
+      result[key] = sourceValue as T[keyof T];
+    }
+  }
+
+  return result;
+}
+
+/**
  * Fetch page content from API with fallback to defaults
  */
 export async function getPageContent(page: string): Promise<PageContent> {
   const pageKey = page.toLowerCase();
-  
+
   try {
     const response = await fetch(`${API_URL}/api/content/${pageKey}`, {
-      cache: 'no-store', // Disable caching to always get fresh content
+      cache: 'no-store',
+      next: { revalidate: 0 },
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
     });
-    
+
     if (response.ok) {
       const data = await response.json();
       if (data.success && data.data) {
+        const apiSections = data.data.sections || {};
+        const defaultSections = getDefaultContent(pageKey);
+
+        // Deep merge: API data overlays defaults, preserving any missing nested fields
+        // This ensures partial section updates don't lose default values
+        const mergedSections = deepMergeSections(defaultSections, apiSections);
+
         return {
           ...data.data,
-          sections: {
-            ...getDefaultContent(pageKey),
-            ...data.data.sections
-          }
+          sections: mergedSections,
         };
       }
+    } else {
+      console.error(`API returned status ${response.status} for ${page}`);
     }
   } catch (error) {
     console.error(`Failed to fetch content for ${page}:`, error);
   }
-  
+
   // Return defaults if API fails
   return {
     page: pageKey,
@@ -472,6 +503,7 @@ export function getSection<T = any>(content: PageContent, section: string): T | 
   return content.sections?.[section] || null;
 }
 
+
 /**
  * Get SEO metadata for a page
  */
@@ -493,7 +525,7 @@ export function getPageSEO(content: PageContent, pageName: string) {
       title: 'Industries - Growth Valley',
       description: 'Deep expertise across SaaS, Professional Services, Manufacturing, and Financial Services.'
     },
-    'case-studies': {
+    'casestudies': {
       title: 'Case Studies - Growth Valley',
       description: 'Real transformations. Real results. See how we\'ve helped B2B companies achieve predictable revenue growth.'
     },
@@ -514,10 +546,10 @@ export function getPageSEO(content: PageContent, pageName: string) {
       description: 'Read the terms and conditions for using Growth Valley\'s website and consulting services.'
     }
   };
-  
+
   const pageKey = pageName.toLowerCase();
   const defaultMeta = defaults[pageKey] || { title: 'Growth Valley', description: '' };
-  
+
   return {
     title: content.seo?.metaTitle || defaultMeta.title,
     description: content.seo?.metaDescription || defaultMeta.description,
